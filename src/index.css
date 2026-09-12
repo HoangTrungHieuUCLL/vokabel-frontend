@@ -1,0 +1,205 @@
+@import "tailwindcss";
+
+/* Same "game-poster" look as the Doener app: warm cream paper, near-black
+   ink, chunky 2px outlines with hard offset "sticker" shadows, heavy
+   uppercase Rubik headlines. No orange.
+
+   Fonts are self-hosted via @fontsource (imported in main.tsx) rather than
+   hotlinked from Google Fonts. */
+@theme {
+  --font-sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Rubik Variable", "Rubik", "Arial Black", "Inter Variable", system-ui, sans-serif;
+
+  --color-bg: #fffbea;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f4efd6;
+  --color-border: #141414;
+  --color-border-soft: #e3dcbd;
+
+  --color-ink: #141414;
+  --color-ink-secondary: #45433b;
+  --color-ink-tertiary: #6e6b5e;
+  --color-ink-placeholder: #a8a493;
+
+  --color-accent: #2e4bff;
+  --color-accent-strong: #2238e0;
+  --color-accent-soft: #dce2ff;
+
+  --color-highlight: #ffd02e;
+  --color-highlight-soft: #fff1b8;
+
+  --color-positive: #a6eb3c;
+  --color-positive-text: #2c6e00;
+  --color-positive-soft: #e8fac8;
+  --color-negative: #e5213f;
+  --color-negative-text: #c5162f;
+  --color-negative-soft: #ffe1e5;
+
+  /* Case colours for the Tabellen reference tab -- fixed hue per case
+     everywhere, always paired with the text label, never colour alone. */
+  --color-case-nom: #2e4bff;
+  --color-case-akk: #e5213f;
+  --color-case-dat: #2c9e4a;
+  --color-case-gen: #a259e6;
+
+  /* One muted colour per word type, for scanning a long result list. */
+  --color-type-nomen: #2e4bff;
+  --color-type-verb: #e5213f;
+  --color-type-adjektiv: #2c9e4a;
+  --color-type-adverb: #a259e6;
+  --color-type-praeposition: #d9791f;
+  --color-type-konjunktion: #0f9aa8;
+  --color-type-pronomen: #c23b8f;
+  --color-type-partikel: #8a7a1f;
+  --color-type-phrase: #5b6470;
+
+  --radius-card: 1.375rem;
+  --radius-control: 0.875rem;
+
+  --shadow-card: 4px 4px 0 0 var(--color-ink);
+  --shadow-pop: 3px 3px 0 0 var(--color-ink);
+  --shadow-lg: 6px 6px 0 0 var(--color-ink);
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+@utility headline {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.92;
+}
+
+@utility eyebrow {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+@utility sticker {
+  border: 2px solid var(--color-ink);
+  box-shadow: var(--shadow-card);
+}
+
+@utility press {
+  transition-property: transform, box-shadow, background-color, color;
+  transition-duration: 120ms;
+  transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+  &:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 0 var(--color-ink);
+  }
+}
+
+@utility marker {
+  background: var(--color-highlight);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0 0.18em;
+  border-radius: 0.2em;
+}
+
+mark {
+  background: var(--color-highlight);
+  color: inherit;
+  border-radius: 0.15em;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1.5px var(--color-ink);
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-accent);
+}
+
+::selection {
+  background: var(--color-highlight);
+  color: var(--color-ink);
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-overlay-in {
+  animation: overlay-in 200ms cubic-bezier(0.165, 0.84, 0.44, 1) both;
+}
+
+.animate-dialog-in {
+  animation: dialog-in 200ms cubic-bezier(0.165, 0.84, 0.44, 1) both;
+}
+
+.animate-page-in {
+  animation: page-in 200ms cubic-bezier(0.165, 0.84, 0.44, 1) both;
+}
+
+.animate-toast-in {
+  animation: toast-in 200ms cubic-bezier(0.165, 0.84, 0.44, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
