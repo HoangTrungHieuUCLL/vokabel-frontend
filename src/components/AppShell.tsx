@@ -1,20 +1,22 @@
 import type { ComponentType, SVGProps } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useI18n } from '../i18n/I18nContext'
 import { useWords } from '../state/WordsContext'
-import { BookIcon, LogoMark, PlusIcon, SearchIcon, SettingsIcon, UploadIcon } from './icons'
+import { BookIcon, GraduationCapIcon, LogoMark, PlusIcon, SearchIcon, SettingsIcon } from './icons'
 import { Toast } from './ui/Toast'
+import type { TranslationKey } from '../i18n/translations'
 
 interface NavItem {
   to: string
-  label: string
+  labelKey: TranslationKey
   Icon: ComponentType<SVGProps<SVGSVGElement>>
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: '/', label: 'Suche', Icon: SearchIcon },
-  { to: '/add', label: 'Add', Icon: PlusIcon },
-  { to: '/tabellen', label: 'Tabellen', Icon: BookIcon },
-  { to: '/import', label: 'Import', Icon: UploadIcon },
+  { to: '/', labelKey: 'nav.search', Icon: SearchIcon },
+  { to: '/add', labelKey: 'nav.add', Icon: PlusIcon },
+  { to: '/tabellen', labelKey: 'nav.tabellen', Icon: BookIcon },
+  { to: '/grammar', labelKey: 'nav.grammar', Icon: GraduationCapIcon },
 ]
 
 function Wordmark({ size }: { size: 'sm' | 'md' }) {
@@ -27,6 +29,7 @@ function Wordmark({ size }: { size: 'sm' | 'md' }) {
 }
 
 export function AppShell() {
+  const { t } = useI18n()
   const location = useLocation()
   const { pendingDelete, undoDelete } = useWords()
 
@@ -37,7 +40,7 @@ export function AppShell() {
           <Wordmark size="md" />
         </div>
         <nav className="flex flex-1 flex-col gap-2">
-          {NAV_ITEMS.map(({ to, label, Icon }) => (
+          {NAV_ITEMS.map(({ to, labelKey, Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -53,7 +56,7 @@ export function AppShell() {
               {({ isActive }) => (
                 <>
                   <Icon className="h-5 w-5" strokeWidth={isActive ? 2.4 : 2} />
-                  {label}
+                  {t(labelKey)}
                 </>
               )}
             </NavLink>
@@ -69,7 +72,7 @@ export function AppShell() {
             }
           >
             <SettingsIcon className="h-5 w-5" />
-            Einstellungen
+            {t('nav.settings')}
           </NavLink>
         </nav>
       </aside>
@@ -77,7 +80,7 @@ export function AppShell() {
       <div className="flex min-h-dvh flex-1 flex-col">
         <header className="flex items-center justify-between border-b-2 border-ink bg-bg px-4 py-2.5 md:hidden">
           <Wordmark size="sm" />
-          <NavLink to="/settings" className="tap-target flex items-center justify-center rounded-full text-ink" aria-label="Einstellungen">
+          <NavLink to="/settings" className="tap-target flex items-center justify-center rounded-full text-ink" aria-label={t('nav.settings')}>
             <SettingsIcon className="h-6 w-6" />
           </NavLink>
         </header>
@@ -88,8 +91,11 @@ export function AppShell() {
           </div>
         </main>
 
-        <nav className="fixed inset-x-3 z-20 flex gap-1 rounded-full border-2 border-ink bg-ink px-2 py-2 shadow-[0_8px_20px_rgba(20,20,20,0.35)] md:hidden" style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-          {NAV_ITEMS.map(({ to, label, Icon }) => (
+        <nav
+          className="fixed inset-x-3 z-20 flex gap-1 rounded-full border-2 border-ink bg-ink px-2 py-2 shadow-[0_8px_20px_rgba(20,20,20,0.35)] md:hidden"
+          style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+        >
+          {NAV_ITEMS.map(({ to, labelKey, Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -103,7 +109,7 @@ export function AppShell() {
               {({ isActive }) => (
                 <>
                   <Icon className="h-6 w-6" strokeWidth={isActive ? 2.4 : 1.9} />
-                  {label}
+                  {t(labelKey)}
                 </>
               )}
             </NavLink>
@@ -112,11 +118,7 @@ export function AppShell() {
       </div>
 
       {pendingDelete && (
-        <Toast
-          message={`„${pendingDelete.word}" gelöscht`}
-          actionLabel="Rückgängig"
-          onAction={undoDelete}
-        />
+        <Toast message={`„${pendingDelete.word}" ${t('toast.deleted')}`} actionLabel={t('toast.undo')} onAction={undoDelete} />
       )}
     </div>
   )
