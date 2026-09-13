@@ -100,18 +100,14 @@ export function AppShell() {
               key={to}
               to={to}
               end={to === '/'}
+              aria-label={t(labelKey)}
               className={({ isActive }) =>
-                `tap-target flex flex-1 flex-col items-center justify-center gap-1 rounded-[var(--radius-control)] py-1.5 font-display text-[10px] font-extrabold uppercase tracking-[0.05em] transition-colors ${
+                `tap-target flex flex-1 items-center justify-center rounded-full py-2 transition-colors ${
                   isActive ? 'bg-highlight text-ink' : 'text-bg/70'
                 }`
               }
             >
-              {({ isActive }) => (
-                <>
-                  <Icon className="h-6 w-6" strokeWidth={isActive ? 2.4 : 1.9} />
-                  {t(labelKey)}
-                </>
-              )}
+              {({ isActive }) => <Icon className="h-6 w-6" strokeWidth={isActive ? 2.4 : 1.9} />}
             </NavLink>
           ))}
         </nav>
