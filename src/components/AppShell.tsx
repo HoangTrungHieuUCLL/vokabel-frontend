@@ -85,7 +85,7 @@ export function AppShell() {
           </NavLink>
         </header>
 
-        <main className="flex-1 overflow-y-auto pb-32 md:pb-8">
+        <main className="flex-1 overflow-y-auto pb-36 md:pb-8">
           <div key={location.pathname} className="animate-page-in mx-auto w-full max-w-3xl px-4 py-6 md:px-8 md:py-10">
             <Outlet />
           </div>
@@ -93,7 +93,7 @@ export function AppShell() {
 
         <nav
           className="fixed inset-x-3 z-20 flex gap-1 rounded-full border-2 border-ink bg-ink px-2 py-2 shadow-[0_8px_20px_rgba(20,20,20,0.35)] md:hidden"
-          style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+          style={{ bottom: 'max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem))' }}
         >
           {NAV_ITEMS.map(({ to, labelKey, Icon }) => (
             <NavLink
