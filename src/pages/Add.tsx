@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ApiError, useWords } from '../state/WordsContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Checkbox } from '../components/ui/Checkbox'
 import { Input, TextArea } from '../components/ui/Input'
+import { TagsInput } from '../components/ui/TagsInput'
 import { TypeChip } from '../components/ui/TypeChip'
 import { TypeAttrsOptional, TypeAttrsRequired } from '../components/TypeAttrsFields'
 import { ChevronDownIcon } from '../components/icons'
@@ -18,7 +19,8 @@ function FieldLabel({ children }: { children: string }) {
 
 export function Add() {
   const { t } = useI18n()
-  const { addWord } = useWords()
+  const { addWord, words } = useWords()
+  const allTags = useMemo(() => Array.from(new Set(words.flatMap((w) => w.tags))).sort(), [words])
   const navigate = useNavigate()
   const wordRef = useRef<HTMLInputElement>(null)
 
@@ -150,7 +152,7 @@ export function Add() {
         <div className="flex flex-col gap-3">
           <TypeAttrsOptional type={type} attrs={attrs} setAttr={setAttr} />
           <TextArea id="add-example" label={t('add.example')} rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
-          <Input id="add-tags" label={t('add.tags')} value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
+          <TagsInput id="add-tags" label={t('add.tags')} value={tagsText} onChange={setTagsText} suggestions={allTags} />
           <Input id="add-source" label={t('add.source')} value={source} onChange={(e) => setSource(e.target.value)} />
         </div>
       )}

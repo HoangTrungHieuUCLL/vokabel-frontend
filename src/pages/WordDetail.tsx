@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ApiError, useWords } from '../state/WordsContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { Input, TextArea } from '../components/ui/Input'
+import { TagsInput } from '../components/ui/TagsInput'
 import { TypeChip } from '../components/ui/TypeChip'
 import { TypeAttrsOptional, TypeAttrsRequired } from '../components/TypeAttrsFields'
 import { ArrowLeftIcon, FlagIcon, TrashIcon } from '../components/icons'
@@ -17,8 +18,9 @@ export function WordDetail() {
   const { id } = useParams<{ id: string }>()
   const wordId = Number(id)
   const navigate = useNavigate()
-  const { getWord, patchWord, scheduleDelete, toggleHard, loading } = useWords()
+  const { getWord, patchWord, scheduleDelete, toggleHard, loading, words } = useWords()
   const word = getWord(wordId)
+  const allTags = useMemo(() => Array.from(new Set(words.flatMap((w) => w.tags))).sort(), [words])
 
   const [editing, setEditing] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -189,7 +191,7 @@ export function WordDetail() {
           />
           <TypeAttrsOptional type={word.type} attrs={attrs} setAttr={setAttr} />
           <TextArea id="detail-example" label={t('add.example')} rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
-          <Input id="detail-tags" label={t('detail.tagsLabel')} value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
+          <TagsInput id="detail-tags" label={t('detail.tagsLabel')} value={tagsText} onChange={setTagsText} suggestions={allTags} />
           <Input id="detail-source" label={t('detail.source')} value={source} onChange={(e) => setSource(e.target.value)} />
           {saveError && <p className="text-[13px] font-semibold text-negative-text">{saveError}</p>}
           {missing.length > 0 && <p className="text-[12px] font-semibold text-ink-tertiary">{missing.join(', ')} {t('add.missingSuffix')}</p>}
