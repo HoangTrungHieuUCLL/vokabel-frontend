@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { WordOfDayCard } from '../components/dashboard/WordOfDayCard'
+import { DailyLineChart } from '../components/dashboard/DailyLineChart'
+import { TypeCountsBars } from '../components/dashboard/TypeCountsBars'
 import { WordRow } from '../components/WordRow'
+import { Card } from '../components/ui/Card'
 import { SearchIcon } from '../components/icons'
 import { useI18n } from '../i18n/I18nContext'
 import { searchWords } from '../lib/search'
+import { countsByType, pickWordOfDay, wordsAddedByDay } from '../lib/stats'
 import { useDebouncedValue } from '../lib/useDebouncedValue'
 import { useWords } from '../state/WordsContext'
 
@@ -23,57 +28,98 @@ export function Search() {
   }, [])
 
   const pool = useMemo(() => (hardOnly ? words.filter((w) => w.is_hard) : words), [words, hardOnly])
+  const showDashboard = !debouncedQuery.trim() && !hardOnly
 
   const results = useMemo(() => {
-    if (!debouncedQuery.trim()) {
-      return pool.map((item) => ({ item, rank: 0 as const, distance: 0, field: 'word' as const, start: 0, end: item.word.length }))
-    }
+    if (!debouncedQuery.trim()) return []
     return searchWords(pool, debouncedQuery)
   }, [pool, debouncedQuery])
 
+  const wordOfDay = useMemo(() => pickWordOfDay(words), [words])
+  const typeCounts = useMemo(() => countsByType(words), [words])
+  const dailyCounts = useMemo(() => wordsAddedByDay(words, 30), [words])
+  const addedTotal = useMemo(() => dailyCounts.reduce((sum, d) => sum + d.count, 0), [dailyCounts])
+
+  const searchBar = (
+    <>
+      <SearchIcon className="pointer-events-none h-5 w-5 shrink-0 text-current opacity-70" />
+      <input
+        ref={inputRef}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={t('search.placeholder')}
+        className="h-8 min-w-0 flex-1 bg-transparent text-[15px] text-current placeholder:text-current placeholder:opacity-50 focus:outline-none"
+      />
+      <button
+        type="button"
+        onClick={() => setHardOnly((h) => !h)}
+        aria-pressed={hardOnly}
+        className={`tap-target shrink-0 rounded-full px-3 font-display text-[12px] font-extrabold uppercase tracking-[0.03em] ${
+          hardOnly ? 'bg-highlight text-ink' : 'text-current opacity-70'
+        }`}
+      >
+        {t('search.hard')} ({hardCount})
+      </button>
+    </>
+  )
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-tertiary" />
-          <input
-            ref={inputRef}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t('search.placeholder')}
-            className="h-12 w-full rounded-[var(--radius-control)] border-2 border-ink bg-surface pl-10 pr-3.5 text-[16px] text-ink placeholder:text-ink-placeholder focus:outline-none focus:ring-4 focus:ring-accent-soft focus:border-accent"
-          />
-        </div>
-        <button
-          type="button"
-          onClick={() => setHardOnly((h) => !h)}
-          aria-pressed={hardOnly}
-          className={`tap-target press shrink-0 rounded-[var(--radius-control)] border-2 border-ink px-3 font-display text-[13px] font-extrabold uppercase tracking-[0.03em] ${
-            hardOnly ? 'bg-negative text-white shadow-[var(--shadow-pop)]' : 'bg-surface text-ink'
-          }`}
-        >
-          {t('search.hard')} ({hardCount})
-        </button>
+      {/* Mobile: floating dark pill, paired with the bottom nav. */}
+      <div
+        className="fixed inset-x-3 z-20 flex items-center gap-2 rounded-full border-2 border-ink bg-ink px-3 py-2 text-white shadow-[0_8px_20px_rgba(20,20,20,0.35)] md:hidden"
+        style={{ top: 'max(0.75rem, env(safe-area-inset-top))' }}
+      >
+        {searchBar}
+      </div>
+      <div className="h-10 shrink-0 md:hidden" />
+
+      {/* Desktop: plain inline bar, no floating chrome needed with a sidebar layout. */}
+      <div className="hidden items-center gap-2 rounded-[var(--radius-control)] border-2 border-ink bg-surface px-3 py-1 text-ink md:flex">
+        {searchBar}
       </div>
 
       {loading && words.length === 0 && <p className="text-[14px] text-ink-tertiary">{t('search.loading')}</p>}
 
-      {!loading && results.length === 0 && (
-        <p className="text-[14px] text-ink-tertiary">{words.length === 0 ? t('search.emptyDb') : t('search.noResults')}</p>
-      )}
+      {showDashboard ? (
+        <div className="flex flex-col gap-4">
+          {wordOfDay && <WordOfDayCard word={wordOfDay} />}
 
-      <ul className="flex flex-col gap-2">
-        {results.map((r) => (
-          <WordRow
-            key={r.item.id}
-            word={r.item}
-            onToggleHard={() => toggleHard(r.item.id)}
-            matchField={r.field}
-            matchStart={r.start}
-            matchEnd={r.end}
-          />
-        ))}
-      </ul>
+          <Card className="flex flex-col gap-2">
+            <p className="eyebrow text-[12px] text-ink-tertiary">{t('dashboard.byType')}</p>
+            <TypeCountsBars counts={typeCounts} />
+          </Card>
+
+          <Card className="flex flex-col gap-2">
+            <p className="eyebrow text-[12px] text-ink-tertiary">{t('dashboard.addedPerDay')}</p>
+            <DailyLineChart data={dailyCounts} />
+            <p className="text-[12px] text-ink-tertiary">
+              {addedTotal} {t('dashboard.addedTotal')}
+            </p>
+          </Card>
+
+          {!loading && words.length === 0 && <p className="text-[14px] text-ink-tertiary">{t('search.emptyDb')}</p>}
+        </div>
+      ) : (
+        <>
+          {!loading && results.length === 0 && <p className="text-[14px] text-ink-tertiary">{t('search.noResults')}</p>}
+          <ul className="flex flex-col gap-2">
+            {(debouncedQuery.trim()
+              ? results
+              : pool.map((item) => ({ item, rank: 0 as const, distance: 0, field: 'word' as const, start: 0, end: item.word.length }))
+            ).map((r) => (
+              <WordRow
+                key={r.item.id}
+                word={r.item}
+                onToggleHard={() => toggleHard(r.item.id)}
+                matchField={r.field}
+                matchStart={r.start}
+                matchEnd={r.end}
+              />
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   )
 }
