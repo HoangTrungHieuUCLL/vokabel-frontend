@@ -92,7 +92,7 @@ export function AppShell() {
         </main>
 
         <nav
-          className="fixed inset-x-3 z-20 flex gap-1 rounded-full border-2 border-ink bg-ink px-2 py-2 shadow-[0_8px_20px_rgba(20,20,20,0.35)] md:hidden"
+          className="fixed inset-x-3 z-20 flex h-16 items-center gap-1 rounded-full border-2 border-ink bg-ink px-2 shadow-[0_8px_20px_rgba(20,20,20,0.35)] md:hidden"
           style={{ bottom: 'max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem))' }}
         >
           {NAV_ITEMS.map(({ to, labelKey, Icon }) => (
@@ -102,7 +102,7 @@ export function AppShell() {
               end={to === '/'}
               aria-label={t(labelKey)}
               className={({ isActive }) =>
-                `tap-target flex flex-1 items-center justify-center rounded-full py-2 transition-colors ${
+                `tap-target flex h-full flex-1 items-center justify-center rounded-full transition-colors ${
                   isActive ? 'bg-highlight text-ink' : 'text-bg/70'
                 }`
               }

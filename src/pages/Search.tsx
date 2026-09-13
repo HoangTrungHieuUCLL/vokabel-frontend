@@ -65,10 +65,10 @@ export function Search() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Mobile: floating bright pill, sitting just above the bottom nav. */}
+      {/* Mobile: floating bright pill -- same height, shape and gap as the nav below it. */}
       <div
-        className="fixed inset-x-3 z-20 flex items-center gap-2 rounded-full border-2 border-ink bg-surface px-3 py-2 shadow-[0_8px_20px_rgba(20,20,20,0.2)] md:hidden"
-        style={{ bottom: 'calc(max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem)) + 3.75rem)' }}
+        className="fixed inset-x-3 z-20 flex h-16 items-center gap-2 rounded-full border-2 border-ink bg-surface px-4 shadow-[0_8px_20px_rgba(20,20,20,0.2)] md:hidden"
+        style={{ bottom: 'calc(max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem)) + 4.75rem)' }}
       >
         {searchBar}
       </div>
