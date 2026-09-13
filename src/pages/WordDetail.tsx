@@ -165,7 +165,13 @@ export function WordDetail() {
         </Card>
       ) : (
         <div className="flex flex-col gap-3">
-          <Input id="detail-word" label="Wort" value={editWord} onChange={(e) => setEditWord(e.target.value)} />
+          <Input
+            id="detail-word"
+            label="Wort"
+            autoCapitalize={word.type === 'nomen' ? 'words' : 'none'}
+            value={editWord}
+            onChange={(e) => setEditWord(e.target.value)}
+          />
           <Input id="detail-meaning" label="Bedeutung" value={meaning} onChange={(e) => setMeaning(e.target.value)} />
           <TypeAttrsRequired
             type={word.type}

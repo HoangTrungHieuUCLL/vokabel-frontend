@@ -106,6 +106,7 @@ export function Add() {
         id="add-word"
         label="Wort"
         autoFocus
+        autoCapitalize={type === 'nomen' ? 'words' : 'none'}
         placeholder="z. B. üben, der Tisch, sich erinnern"
         value={word}
         onChange={(e) => setWord(e.target.value)}
