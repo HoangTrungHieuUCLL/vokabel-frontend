@@ -36,7 +36,10 @@ export function Add() {
 
   function selectType(next: WordType) {
     setType(next)
-    setAttrs({})
+    // hilfsverb shows "haben" pre-selected in the UI, so it must actually be
+    // in state -- otherwise Save stays disabled with "Hilfsverb fehlt" even
+    // though the button already looks chosen.
+    setAttrs(next === 'verb' ? { hilfsverb: 'haben' } : {})
     setRegelmaessig(false)
     setDuplicate(null)
   }
