@@ -42,20 +42,20 @@ export function Search() {
 
   const searchBar = (
     <>
-      <SearchIcon className="pointer-events-none h-5 w-5 shrink-0 text-current opacity-70" />
+      <SearchIcon className="pointer-events-none h-5 w-5 shrink-0 text-ink-tertiary" />
       <input
         ref={inputRef}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t('search.placeholder')}
-        className="h-8 min-w-0 flex-1 bg-transparent text-[15px] text-current placeholder:text-current placeholder:opacity-50 focus:outline-none"
+        className="h-8 min-w-0 flex-1 bg-transparent text-[15px] text-ink placeholder:text-ink-placeholder focus:outline-none"
       />
       <button
         type="button"
         onClick={() => setHardOnly((h) => !h)}
         aria-pressed={hardOnly}
         className={`tap-target shrink-0 rounded-full px-3 font-display text-[12px] font-extrabold uppercase tracking-[0.03em] ${
-          hardOnly ? 'bg-highlight text-ink' : 'text-current opacity-70'
+          hardOnly ? 'bg-negative text-white' : 'text-ink-tertiary'
         }`}
       >
         {t('search.hard')} ({hardCount})
@@ -65,14 +65,13 @@ export function Search() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Mobile: floating dark pill, paired with the bottom nav. */}
+      {/* Mobile: floating bright pill, sitting just above the bottom nav. */}
       <div
-        className="fixed inset-x-3 z-20 flex items-center gap-2 rounded-full border-2 border-ink bg-ink px-3 py-2 text-white shadow-[0_8px_20px_rgba(20,20,20,0.35)] md:hidden"
-        style={{ top: 'max(0.75rem, env(safe-area-inset-top))' }}
+        className="fixed inset-x-3 z-20 flex items-center gap-2 rounded-full border-2 border-ink bg-surface px-3 py-2 shadow-[0_8px_20px_rgba(20,20,20,0.2)] md:hidden"
+        style={{ bottom: 'calc(max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem)) + 3.75rem)' }}
       >
         {searchBar}
       </div>
-      <div className="h-10 shrink-0 md:hidden" />
 
       {/* Desktop: plain inline bar, no floating chrome needed with a sidebar layout. */}
       <div className="hidden items-center gap-2 rounded-[var(--radius-control)] border-2 border-ink bg-surface px-3 py-1 text-ink md:flex">
@@ -120,6 +119,9 @@ export function Search() {
           </ul>
         </>
       )}
+
+      {/* Clears the floating search bar, which sits above the bottom nav on mobile. */}
+      <div className="h-16 shrink-0 md:hidden" />
     </div>
   )
 }
