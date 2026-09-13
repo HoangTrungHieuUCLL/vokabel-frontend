@@ -1,3 +1,5 @@
+import type { TranslationKey } from '../i18n/translations'
+
 export const WORD_TYPES = [
   'nomen',
   'verb',
@@ -12,16 +14,16 @@ export const WORD_TYPES = [
 
 export type WordType = (typeof WORD_TYPES)[number]
 
-export const TYPE_LABEL: Record<WordType, string> = {
-  nomen: 'Nomen',
-  verb: 'Verb',
-  adjektiv: 'Adjektiv',
-  adverb: 'Adverb',
-  praeposition: 'Präposition',
-  konjunktion: 'Konjunktion',
-  pronomen: 'Pronomen',
-  partikel: 'Partikel',
-  phrase: 'Phrase',
+export const TYPE_LABEL_KEY: Record<WordType, TranslationKey> = {
+  nomen: 'type.nomen',
+  verb: 'type.verb',
+  adjektiv: 'type.adjektiv',
+  adverb: 'type.adverb',
+  praeposition: 'type.praeposition',
+  konjunktion: 'type.konjunktion',
+  pronomen: 'type.pronomen',
+  partikel: 'type.partikel',
+  phrase: 'type.phrase',
 }
 
 export const TYPE_ABBR: Record<WordType, string> = {
@@ -52,7 +54,7 @@ export type AttrFieldType = 'enum' | 'string' | 'bool'
 
 export interface AttrFieldSpec {
   key: string
-  label: string
+  label: TranslationKey
   type: AttrFieldType
   options?: string[]
 }
@@ -66,54 +68,54 @@ export interface TypeAttrSpec {
 export const TYPE_ATTR_SPEC: Record<WordType, TypeAttrSpec> = {
   nomen: {
     required: [
-      { key: 'artikel', label: 'Artikel', type: 'enum', options: ['der', 'die', 'das'] },
-      { key: 'plural', label: 'Plural', type: 'string' },
+      { key: 'artikel', label: 'attr.artikel', type: 'enum', options: ['der', 'die', 'das'] },
+      { key: 'plural', label: 'attr.plural', type: 'string' },
     ],
-    optional: [{ key: 'genitiv', label: 'Genitiv', type: 'string' }],
+    optional: [{ key: 'genitiv', label: 'attr.genitiv', type: 'string' }],
   },
   verb: {
     required: [
-      { key: 'hilfsverb', label: 'Hilfsverb', type: 'enum', options: ['haben', 'sein'] },
-      { key: 'praesens_3sg', label: 'Präsens 3.Sg', type: 'string' },
-      { key: 'praeteritum', label: 'Präteritum', type: 'string' },
-      { key: 'partizip_ii', label: 'Partizip II', type: 'string' },
+      { key: 'hilfsverb', label: 'attr.hilfsverb', type: 'enum', options: ['haben', 'sein'] },
+      { key: 'praesens_3sg', label: 'attr.praesens_3sg', type: 'string' },
+      { key: 'praeteritum', label: 'attr.praeteritum', type: 'string' },
+      { key: 'partizip_ii', label: 'attr.partizip_ii', type: 'string' },
     ],
     optional: [
-      { key: 'trennbar', label: 'Trennbar', type: 'bool' },
-      { key: 'reflexiv', label: 'Reflexiv', type: 'bool' },
-      { key: 'rektion', label: 'Rektion', type: 'string' },
+      { key: 'trennbar', label: 'attr.trennbar', type: 'bool' },
+      { key: 'reflexiv', label: 'attr.reflexiv', type: 'bool' },
+      { key: 'rektion', label: 'attr.rektion', type: 'string' },
     ],
   },
   adjektiv: {
     required: [],
     optional: [
-      { key: 'komparativ', label: 'Komparativ', type: 'string' },
-      { key: 'superlativ', label: 'Superlativ', type: 'string' },
+      { key: 'komparativ', label: 'attr.komparativ', type: 'string' },
+      { key: 'superlativ', label: 'attr.superlativ', type: 'string' },
     ],
   },
   adverb: {
     required: [],
-    optional: [{ key: 'position', label: 'Position', type: 'string' }],
+    optional: [{ key: 'position', label: 'attr.position', type: 'string' }],
   },
   praeposition: {
-    required: [{ key: 'kasus', label: 'Kasus', type: 'enum', options: ['akk', 'dat', 'gen', 'wechsel'] }],
+    required: [{ key: 'kasus', label: 'attr.kasus', type: 'enum', options: ['akk', 'dat', 'gen', 'wechsel'] }],
     optional: [],
   },
   konjunktion: {
     required: [
-      { key: 'wortstellung', label: 'Wortstellung', type: 'enum', options: ['pos0', 'pos1', 'verb_ende'] },
+      { key: 'wortstellung', label: 'attr.wortstellung', type: 'enum', options: ['pos0', 'pos1', 'verb_ende'] },
     ],
     optional: [],
   },
   pronomen: { required: [], optional: [] },
   partikel: {
     required: [],
-    optional: [{ key: 'register', label: 'Register', type: 'string' }],
+    optional: [{ key: 'register', label: 'attr.register', type: 'string' }],
   },
   phrase: {
     required: [],
     optional: [
-      { key: 'register', label: 'Register', type: 'enum', options: ['formell', 'informell', 'neutral'] },
+      { key: 'register', label: 'attr.register', type: 'enum', options: ['formell', 'informell', 'neutral'] },
     ],
   },
 }

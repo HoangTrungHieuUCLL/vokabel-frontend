@@ -1,4 +1,5 @@
-import { TYPE_ABBR, TYPE_COLOR_VAR, TYPE_LABEL, type WordType } from '../../lib/wordTypes'
+import { useI18n } from '../../i18n/I18nContext'
+import { TYPE_ABBR, TYPE_COLOR_VAR, TYPE_LABEL_KEY, type WordType } from '../../lib/wordTypes'
 
 interface TypeChipProps {
   type: WordType
@@ -15,6 +16,7 @@ interface TypeChipProps {
  * colour perception alone.
  */
 export function TypeChip({ type, selected, onClick, showLabel = false, size = 'sm' }: TypeChipProps) {
+  const { t } = useI18n()
   const colorVar = `var(${TYPE_COLOR_VAR[type]})`
   const style = {
     '--chip-color': colorVar,
@@ -35,7 +37,7 @@ export function TypeChip({ type, selected, onClick, showLabel = false, size = 's
       className={`tap-target inline-flex items-center justify-center rounded-full border-2 border-ink font-display font-extrabold uppercase tracking-[0.03em] ${sizeClasses} ${onClick ? 'press' : ''}`}
     >
       <span>{TYPE_ABBR[type]}</span>
-      {showLabel && <span className="normal-case tracking-normal">{TYPE_LABEL[type]}</span>}
+      {showLabel && <span className="normal-case tracking-normal">{t(TYPE_LABEL_KEY[type])}</span>}
     </Tag>
   )
 }
