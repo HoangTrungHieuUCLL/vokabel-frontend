@@ -22,6 +22,11 @@ const de = {
   'search.noResults': 'Keine Treffer.',
   'search.toggleHardAria': 'schwer zu merken umschalten',
 
+  'dashboard.wordOfDay': 'Wort des Tages',
+  'dashboard.byType': 'Wörter nach Typ',
+  'dashboard.addedPerDay': 'Neue Wörter (letzte 30 Tage)',
+  'dashboard.addedTotal': 'in den letzten 30 Tagen',
+
   'add.title': 'Wort hinzufügen',
   'add.wordLabel': 'Wort',
   'add.wordPlaceholder': 'z. B. üben, der Tisch, sich erinnern',
@@ -225,6 +230,11 @@ const en: Record<Key, string> = {
   'search.emptyDb': 'No words yet — head straight to "Add".',
   'search.noResults': 'No matches.',
   'search.toggleHardAria': 'toggle hard-to-remember',
+
+  'dashboard.wordOfDay': 'Word of the day',
+  'dashboard.byType': 'Words by type',
+  'dashboard.addedPerDay': 'New words (last 30 days)',
+  'dashboard.addedTotal': 'in the last 30 days',
 
   'add.title': 'Add word',
   'add.wordLabel': 'Word',
