@@ -8,6 +8,7 @@ import { Input, TextArea } from '../components/ui/Input'
 import { TypeChip } from '../components/ui/TypeChip'
 import { TypeAttrsOptional, TypeAttrsRequired } from '../components/TypeAttrsFields'
 import { ChevronDownIcon } from '../components/icons'
+import { useI18n } from '../i18n/I18nContext'
 import { missingRequiredAttrs, WORD_TYPES, type WordType } from '../lib/wordTypes'
 import type { Word } from '../api/types'
 
@@ -16,6 +17,7 @@ function FieldLabel({ children }: { children: string }) {
 }
 
 export function Add() {
+  const { t } = useI18n()
   const { addWord } = useWords()
   const navigate = useNavigate()
   const wordRef = useRef<HTMLInputElement>(null)
@@ -64,9 +66,9 @@ export function Add() {
   }
 
   const missing: string[] = []
-  if (!word.trim()) missing.push('Wort')
-  if (!meaning.trim()) missing.push('Bedeutung')
-  missing.push(...missingRequiredAttrs(type, attrs).map((f) => f.label))
+  if (!word.trim()) missing.push(t('add.fieldWord'))
+  if (!meaning.trim()) missing.push(t('add.fieldMeaning'))
+  missing.push(...missingRequiredAttrs(type, attrs).map((f) => t(f.label)))
 
   async function handleSubmit() {
     if (missing.length > 0) return
@@ -93,7 +95,7 @@ export function Add() {
         const existing = (err.body as { detail?: { existing?: Word } })?.detail?.existing
         if (existing) setDuplicate(existing)
       } else {
-        setSubmitError(err instanceof Error ? err.message : 'Speichern fehlgeschlagen')
+        setSubmitError(err instanceof Error ? err.message : t('add.saveFailed'))
       }
     } finally {
       setSaving(false)
@@ -102,29 +104,29 @@ export function Add() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="headline text-[32px]">Wort hinzufügen</h1>
+      <h1 className="headline text-[32px]">{t('add.title')}</h1>
 
       <Input
         ref={wordRef}
         id="add-word"
-        label="Wort"
+        label={t('add.wordLabel')}
         autoFocus
         autoCapitalize={type === 'nomen' ? 'words' : 'none'}
-        placeholder="z. B. üben, der Tisch, sich erinnern"
+        placeholder={t('add.wordPlaceholder')}
         value={word}
         onChange={(e) => setWord(e.target.value)}
       />
 
       <div className="flex flex-col gap-2">
-        <FieldLabel>Wortart</FieldLabel>
+        <FieldLabel>{t('add.wortart')}</FieldLabel>
         <div className="flex flex-wrap gap-2">
-          {WORD_TYPES.map((t) => (
-            <TypeChip key={t} type={t} selected={type === t} showLabel size="md" onClick={() => selectType(t)} />
+          {WORD_TYPES.map((wt) => (
+            <TypeChip key={wt} type={wt} selected={type === wt} showLabel size="md" onClick={() => selectType(wt)} />
           ))}
         </div>
       </div>
 
-      <Input id="add-meaning" label="Bedeutung" value={meaning} onChange={(e) => setMeaning(e.target.value)} />
+      <Input id="add-meaning" label={t('add.meaning')} value={meaning} onChange={(e) => setMeaning(e.target.value)} />
 
       <TypeAttrsRequired
         type={type}
@@ -141,32 +143,32 @@ export function Add() {
         className="tap-target flex items-center gap-2 self-start font-display text-[13px] font-extrabold uppercase tracking-[0.03em] text-ink-secondary"
       >
         <ChevronDownIcon className={`h-4 w-4 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
-        mehr
+        {t('add.more')}
       </button>
 
       {moreOpen && (
         <div className="flex flex-col gap-3">
           <TypeAttrsOptional type={type} attrs={attrs} setAttr={setAttr} />
-          <TextArea id="add-example" label="Beispielsatz (optional)" rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
-          <Input id="add-tags" label="Tags (optional, mit Komma trennen)" value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
-          <Input id="add-source" label="Quelle (optional)" value={source} onChange={(e) => setSource(e.target.value)} />
+          <TextArea id="add-example" label={t('add.example')} rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
+          <Input id="add-tags" label={t('add.tags')} value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
+          <Input id="add-source" label={t('add.source')} value={source} onChange={(e) => setSource(e.target.value)} />
         </div>
       )}
 
-      <Checkbox id="add-hard" label="schwer zu merken" checked={isHard} onChange={(e) => setIsHard(e.target.checked)} />
+      <Checkbox id="add-hard" label={t('add.hard')} checked={isHard} onChange={(e) => setIsHard(e.target.checked)} />
 
       {duplicate && (
         <Card className="border-highlight bg-highlight-soft">
-          <p className="eyebrow mb-1">Gibt es schon</p>
+          <p className="eyebrow mb-1">{t('add.duplicateTitle')}</p>
           <p className="text-[15px] font-semibold text-ink">
             {duplicate.word} — {duplicate.meaning}
           </p>
           <div className="mt-3 flex gap-2">
             <Button variant="secondary" size="sm" onClick={() => navigate(`/word/${duplicate.id}`)}>
-              Öffnen
+              {t('add.open')}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setDuplicate(null)}>
-              Trotzdem speichern (Wort anpassen)
+              {t('add.saveAnyway')}
             </Button>
           </div>
         </Card>
@@ -176,9 +178,9 @@ export function Add() {
 
       <div className="flex flex-col items-start gap-2">
         <Button size="lg" className="w-full" disabled={missing.length > 0 || saving} onClick={handleSubmit}>
-          {saving ? 'Speichern…' : 'Speichern'}
+          {saving ? t('add.saving') : t('add.save')}
         </Button>
-        {missing.length > 0 && <p className="text-[12px] font-semibold text-ink-tertiary">{missing.join(', ')} fehlt</p>}
+        {missing.length > 0 && <p className="text-[12px] font-semibold text-ink-tertiary">{missing.join(', ')} {t('add.missingSuffix')}</p>}
       </div>
     </div>
   )

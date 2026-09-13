@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { WordRow } from '../components/WordRow'
 import { SearchIcon } from '../components/icons'
+import { useI18n } from '../i18n/I18nContext'
 import { searchWords } from '../lib/search'
 import { useDebouncedValue } from '../lib/useDebouncedValue'
 import { useWords } from '../state/WordsContext'
 
 export function Search() {
+  const { t } = useI18n()
   const { words, loading, hardCount, toggleHard } = useWords()
   const [query, setQuery] = useState('')
   const [hardOnly, setHardOnly] = useState(false)
@@ -38,7 +40,7 @@ export function Search() {
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Wort oder Bedeutung suchen…"
+            placeholder={t('search.placeholder')}
             className="h-12 w-full rounded-[var(--radius-control)] border-2 border-ink bg-surface pl-10 pr-3.5 text-[16px] text-ink placeholder:text-ink-placeholder focus:outline-none focus:ring-4 focus:ring-accent-soft focus:border-accent"
           />
         </div>
@@ -50,16 +52,14 @@ export function Search() {
             hardOnly ? 'bg-negative text-white shadow-[var(--shadow-pop)]' : 'bg-surface text-ink'
           }`}
         >
-          schwer ({hardCount})
+          {t('search.hard')} ({hardCount})
         </button>
       </div>
 
-      {loading && words.length === 0 && <p className="text-[14px] text-ink-tertiary">Lädt…</p>}
+      {loading && words.length === 0 && <p className="text-[14px] text-ink-tertiary">{t('search.loading')}</p>}
 
       {!loading && results.length === 0 && (
-        <p className="text-[14px] text-ink-tertiary">
-          {words.length === 0 ? 'Noch keine Wörter — leg direkt auf „Add" los.' : 'Keine Treffer.'}
-        </p>
+        <p className="text-[14px] text-ink-tertiary">{words.length === 0 ? t('search.emptyDb') : t('search.noResults')}</p>
       )}
 
       <ul className="flex flex-col gap-2">

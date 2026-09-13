@@ -8,10 +8,12 @@ import { Input, TextArea } from '../components/ui/Input'
 import { TypeChip } from '../components/ui/TypeChip'
 import { TypeAttrsOptional, TypeAttrsRequired } from '../components/TypeAttrsFields'
 import { ArrowLeftIcon, FlagIcon, TrashIcon } from '../components/icons'
+import { useI18n } from '../i18n/I18nContext'
 import { TYPE_ATTR_SPEC, missingRequiredAttrs } from '../lib/wordTypes'
 import { formatSince } from '../lib/relativeTime'
 
 export function WordDetail() {
+  const { t } = useI18n()
   const { id } = useParams<{ id: string }>()
   const wordId = Number(id)
   const navigate = useNavigate()
@@ -45,9 +47,9 @@ export function WordDetail() {
     return (
       <div className="flex flex-col gap-4">
         <Link to="/" className="tap-target inline-flex w-fit items-center gap-2 text-ink-secondary">
-          <ArrowLeftIcon className="h-5 w-5" /> Zurück
+          <ArrowLeftIcon className="h-5 w-5" /> {t('detail.back')}
         </Link>
-        <p className="text-[14px] text-ink-tertiary">{loading ? 'Lädt…' : 'Wort nicht gefunden.'}</p>
+        <p className="text-[14px] text-ink-tertiary">{loading ? t('search.loading') : t('detail.notFound')}</p>
       </div>
     )
   }
@@ -57,9 +59,9 @@ export function WordDetail() {
   }
 
   const missing: string[] = []
-  if (!editWord.trim()) missing.push('Wort')
-  if (!meaning.trim()) missing.push('Bedeutung')
-  missing.push(...missingRequiredAttrs(word.type, attrs).map((f) => f.label))
+  if (!editWord.trim()) missing.push(t('add.fieldWord'))
+  if (!meaning.trim()) missing.push(t('add.fieldMeaning'))
+  missing.push(...missingRequiredAttrs(word.type, attrs).map((f) => t(f.label)))
 
   async function handleSave() {
     if (missing.length > 0 || !word) return
@@ -80,9 +82,9 @@ export function WordDetail() {
       setEditing(false)
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
-        setSaveError('Ein Wort mit diesem Text und Typ existiert schon.')
+        setSaveError(t('detail.duplicateError'))
       } else {
-        setSaveError(err instanceof Error ? err.message : 'Speichern fehlgeschlagen')
+        setSaveError(err instanceof Error ? err.message : t('add.saveFailed'))
       }
     } finally {
       setSaving(false)
@@ -101,7 +103,7 @@ export function WordDetail() {
   return (
     <div className="flex flex-col gap-5">
       <Link to="/" className="tap-target inline-flex w-fit items-center gap-2 text-ink-secondary">
-        <ArrowLeftIcon className="h-5 w-5" /> Zurück
+        <ArrowLeftIcon className="h-5 w-5" /> {t('detail.back')}
       </Link>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -120,21 +122,21 @@ export function WordDetail() {
         }}
       >
         <FlagIcon className="h-4 w-4 shrink-0" fill={word.is_hard ? 'currentColor' : 'none'} />
-        schwer zu merken
+        {t('detail.hardToggle')}
       </button>
       {word.is_hard && word.hard_since && (
-        <p className="text-[12px] font-semibold text-ink-tertiary">{formatSince(word.hard_since)} als schwer markiert</p>
+        <p className="text-[12px] font-semibold text-ink-tertiary">{formatSince(word.hard_since)} {t('detail.hardSinceSuffix')}</p>
       )}
 
       {!editing ? (
         <Card className="flex flex-col gap-3">
           <div>
-            <p className="eyebrow text-[11px] text-ink-tertiary">Bedeutung</p>
+            <p className="eyebrow text-[11px] text-ink-tertiary">{t('detail.meaning')}</p>
             <p className="text-[16px] text-ink">{word.meaning}</p>
           </div>
           {word.example && (
             <div>
-              <p className="eyebrow text-[11px] text-ink-tertiary">Beispiel</p>
+              <p className="eyebrow text-[11px] text-ink-tertiary">{t('detail.example')}</p>
               <p className="text-[15px] italic text-ink-secondary">{word.example}</p>
             </div>
           )}
@@ -145,8 +147,8 @@ export function WordDetail() {
                 if (value === undefined || value === null || value === '') return null
                 return (
                   <div key={field.key}>
-                    <p className="eyebrow text-[11px] text-ink-tertiary">{field.label}</p>
-                    <p className="text-[14px] text-ink">{typeof value === 'boolean' ? (value ? 'ja' : 'nein') : String(value)}</p>
+                    <p className="eyebrow text-[11px] text-ink-tertiary">{t(field.label)}</p>
+                    <p className="text-[14px] text-ink">{typeof value === 'boolean' ? (value ? t('detail.yes') : t('detail.no')) : String(value)}</p>
                   </div>
                 )
               })}
@@ -161,18 +163,22 @@ export function WordDetail() {
               ))}
             </div>
           )}
-          {word.source && <p className="text-[12px] text-ink-tertiary">Quelle: {word.source}</p>}
+          {word.source && (
+            <p className="text-[12px] text-ink-tertiary">
+              {t('detail.source')}: {word.source}
+            </p>
+          )}
         </Card>
       ) : (
         <div className="flex flex-col gap-3">
           <Input
             id="detail-word"
-            label="Wort"
+            label={t('add.wordLabel')}
             autoCapitalize={word.type === 'nomen' ? 'words' : 'none'}
             value={editWord}
             onChange={(e) => setEditWord(e.target.value)}
           />
-          <Input id="detail-meaning" label="Bedeutung" value={meaning} onChange={(e) => setMeaning(e.target.value)} />
+          <Input id="detail-meaning" label={t('add.meaning')} value={meaning} onChange={(e) => setMeaning(e.target.value)} />
           <TypeAttrsRequired
             type={word.type}
             word={editWord}
@@ -182,11 +188,11 @@ export function WordDetail() {
             setRegelmaessig={setRegelmaessig}
           />
           <TypeAttrsOptional type={word.type} attrs={attrs} setAttr={setAttr} />
-          <TextArea id="detail-example" label="Beispielsatz" rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
-          <Input id="detail-tags" label="Tags (mit Komma trennen)" value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
-          <Input id="detail-source" label="Quelle" value={source} onChange={(e) => setSource(e.target.value)} />
+          <TextArea id="detail-example" label={t('add.example')} rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
+          <Input id="detail-tags" label={t('detail.tagsLabel')} value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
+          <Input id="detail-source" label={t('detail.source')} value={source} onChange={(e) => setSource(e.target.value)} />
           {saveError && <p className="text-[13px] font-semibold text-negative-text">{saveError}</p>}
-          {missing.length > 0 && <p className="text-[12px] font-semibold text-ink-tertiary">{missing.join(', ')} fehlt</p>}
+          {missing.length > 0 && <p className="text-[12px] font-semibold text-ink-tertiary">{missing.join(', ')} {t('add.missingSuffix')}</p>}
         </div>
       )}
 
@@ -194,19 +200,19 @@ export function WordDetail() {
         {editing ? (
           <>
             <Button variant="secondary" className="flex-1" onClick={() => setEditing(false)} disabled={saving}>
-              Abbrechen
+              {t('detail.cancel')}
             </Button>
             <Button className="flex-1" onClick={handleSave} disabled={saving || missing.length > 0}>
-              {saving ? 'Speichern…' : 'Speichern'}
+              {saving ? t('add.saving') : t('add.save')}
             </Button>
           </>
         ) : (
           <>
             <Button variant="secondary" className="flex-1" onClick={() => setEditing(true)}>
-              Bearbeiten
+              {t('detail.edit')}
             </Button>
             <Button variant="danger" className="flex-1" onClick={() => setConfirmingDelete(true)}>
-              <TrashIcon className="h-4 w-4" /> Löschen
+              <TrashIcon className="h-4 w-4" /> {t('detail.delete')}
             </Button>
           </>
         )}
@@ -214,9 +220,9 @@ export function WordDetail() {
 
       {confirmingDelete && (
         <ConfirmDialog
-          title="Wort löschen?"
-          message={`„${word.word}" wird gelöscht. Das lässt sich kurz danach noch rückgängig machen.`}
-          confirmLabel="Löschen"
+          title={t('detail.deleteTitle')}
+          message={`„${word.word}" ${t('detail.deleteMessage')}`}
+          confirmLabel={t('detail.delete')}
           danger
           onConfirm={handleDelete}
           onCancel={() => setConfirmingDelete(false)}

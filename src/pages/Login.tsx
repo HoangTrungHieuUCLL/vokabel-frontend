@@ -4,8 +4,10 @@ import { useAuth } from '../auth/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { LogoMark } from '../components/icons'
+import { useI18n } from '../i18n/I18nContext'
 
 export function Login() {
+  const { t } = useI18n()
   const { login, authError, clearAuthError } = useAuth()
   const navigate = useNavigate()
   const location = useLocation() as { state?: { from?: { pathname: string } } }
@@ -35,14 +37,14 @@ export function Login() {
           <LogoMark className="h-16 w-16" />
           <h1 className="headline text-[56px]">Vokabel</h1>
           <p className="font-display text-[14px] font-extrabold uppercase tracking-[0.03em] text-ink">
-            <span className="marker">Deutsch lernen, ein Wort nach dem anderen.</span>
+            <span className="marker">{t('login.tagline')}</span>
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Input
             id="username"
-            label="Benutzername"
+            label={t('login.username')}
             type="text"
             autoComplete="username"
             required
@@ -51,7 +53,7 @@ export function Login() {
           />
           <Input
             id="password"
-            label="Passwort"
+            label={t('login.password')}
             type="password"
             autoComplete="current-password"
             required
@@ -66,7 +68,7 @@ export function Login() {
           )}
 
           <Button type="submit" size="lg" disabled={submitting} className="w-full">
-            {submitting ? 'Anmelden…' : 'Anmelden'}
+            {submitting ? t('login.submitting') : t('login.submit')}
           </Button>
         </form>
       </div>

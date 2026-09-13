@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { Word } from '../api/types'
+import { useI18n } from '../i18n/I18nContext'
 import type { MatchField } from '../lib/search'
 import { TypeChip } from './ui/TypeChip'
 import { FlagIcon } from './icons'
@@ -24,6 +25,7 @@ function Highlighted({ text, start, end }: { text: string; start: number; end: n
 }
 
 export function WordRow({ word, onToggleHard, matchField, matchStart, matchEnd }: WordRowProps) {
+  const { t } = useI18n()
   const meaningHighlighted = matchField === 'meaning' && matchStart !== undefined && matchEnd !== undefined
   const exampleHighlighted = matchField === 'example' && matchStart !== undefined && matchEnd !== undefined
 
@@ -57,7 +59,7 @@ export function WordRow({ word, onToggleHard, matchField, matchStart, matchEnd }
             e.stopPropagation()
             onToggleHard()
           }}
-          aria-label="schwer zu merken umschalten"
+          aria-label={t('search.toggleHardAria')}
           aria-pressed={word.is_hard}
           className="tap-target flex items-center justify-center rounded-full"
         >
