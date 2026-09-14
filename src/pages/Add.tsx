@@ -4,6 +4,7 @@ import { ApiError, useWords } from '../state/WordsContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Checkbox } from '../components/ui/Checkbox'
+import { ExampleSentencesInput } from '../components/ui/ExampleSentencesInput'
 import { Input, TextArea } from '../components/ui/Input'
 import { TagsInput } from '../components/ui/TagsInput'
 import { TypeChip } from '../components/ui/TypeChip'
@@ -11,7 +12,7 @@ import { TypeAttrsOptional, TypeAttrsRequired } from '../components/TypeAttrsFie
 import { ChevronDownIcon } from '../components/icons'
 import { useI18n } from '../i18n/I18nContext'
 import { missingRequiredAttrs, WORD_TYPES, type WordType } from '../lib/wordTypes'
-import type { Word } from '../api/types'
+import type { ExampleSentence, Word } from '../api/types'
 
 function FieldLabel({ children }: { children: string }) {
   return <span className="eyebrow text-[12px]">{children}</span>
@@ -27,7 +28,7 @@ export function Add() {
   const [word, setWord] = useState('')
   const [type, setType] = useState<WordType>('nomen')
   const [meaning, setMeaning] = useState('')
-  const [example, setExample] = useState('')
+  const [example, setExample] = useState<ExampleSentence[]>([])
   const [tagsText, setTagsText] = useState('')
   const [source, setSource] = useState('')
   const [comment, setComment] = useState('')
@@ -56,7 +57,7 @@ export function Add() {
   function resetForm() {
     setWord('')
     setMeaning('')
-    setExample('')
+    setExample([])
     setTagsText('')
     setSource('')
     setComment('')
@@ -84,7 +85,7 @@ export function Add() {
         word: word.trim(),
         type,
         meaning: meaning.trim(),
-        example: example.trim() || null,
+        example: example.filter((ex) => ex.de.trim()).map((ex) => ({ de: ex.de.trim(), meaning: ex.meaning.trim() })),
         attrs,
         tags: tagsText
           .split(',')
@@ -154,7 +155,14 @@ export function Add() {
       {moreOpen && (
         <div className="flex flex-col gap-3">
           <TypeAttrsOptional type={type} attrs={attrs} setAttr={setAttr} />
-          <TextArea id="add-example" label={t('add.example')} rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
+          <ExampleSentencesInput
+            label={t('add.example')}
+            dePlaceholder={t('add.exampleDe')}
+            meaningPlaceholder={t('add.exampleMeaning')}
+            addLabel={t('add.addExample')}
+            value={example}
+            onChange={setExample}
+          />
           <TagsInput id="add-tags" label={t('add.tags')} value={tagsText} onChange={setTagsText} suggestions={allTags} />
           <Input id="add-source" label={t('add.source')} value={source} onChange={(e) => setSource(e.target.value)} />
           <TextArea id="add-comment" label={t('add.comment')} rows={2} value={comment} onChange={(e) => setComment(e.target.value)} />

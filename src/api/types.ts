@@ -1,5 +1,10 @@
 import type { WordType } from '../lib/wordTypes'
 
+export interface ExampleSentence {
+  de: string
+  meaning: string
+}
+
 // Mirrors app/schemas.py::WordOut on the backend field-for-field (snake_case,
 // on purpose) so there's no mapping layer between wire format and app state.
 export interface Word {
@@ -8,7 +13,7 @@ export interface Word {
   search_key: string
   type: WordType
   meaning: string
-  example: string | null
+  example: ExampleSentence[]
   attrs: Record<string, unknown>
   tags: string[]
   source: string | null
@@ -29,7 +34,7 @@ export interface WordCreate {
   word: string
   type: WordType
   meaning: string
-  example?: string | null
+  example?: ExampleSentence[]
   attrs?: Record<string, unknown>
   tags?: string[]
   source?: string | null

@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { makeSearchKey } from './searchKey'
 import { searchWords, type Searchable } from './search'
 
-function word(id: number, w: string, meaning = '', example: string | null = null, tags: string[] = []): Searchable {
+function word(
+  id: number,
+  w: string,
+  meaning = '',
+  example: { de: string; meaning: string }[] = [],
+  tags: string[] = [],
+): Searchable {
   return { id, word: w, search_key: makeSearchKey(w), meaning, example, tags }
 }
 
@@ -55,9 +61,16 @@ describe('searchWords', () => {
   })
 
   it('finds a word by tag name', () => {
-    const items = [word(1, 'Buch', 'book', null, ['b1-exam'])]
+    const items = [word(1, 'Buch', 'book', [], ['b1-exam'])]
     const results = searchWords(items, 'b1-exam')
     expect(results[0]?.field).toBe('tag')
-    expect(results[0]?.tag).toBe('b1-exam')
+    expect(results[0]?.matchText).toBe('b1-exam')
+  })
+
+  it('finds a word by an example sentence', () => {
+    const items = [word(1, 'Buch', 'book', [{ de: 'Ich lese ein Buch.', meaning: 'I am reading a book.' }])]
+    const results = searchWords(items, 'lese')
+    expect(results[0]?.field).toBe('example')
+    expect(results[0]?.matchText).toBe('Ich lese ein Buch.')
   })
 })

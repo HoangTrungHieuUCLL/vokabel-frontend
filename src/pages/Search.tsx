@@ -105,7 +105,7 @@ export function Search() {
           <ul className="flex flex-col gap-2">
             {(debouncedQuery.trim()
               ? results
-              : pool.map((item) => ({ item, rank: 0 as const, distance: 0, field: 'word' as const, start: 0, end: item.word.length, tag: undefined }))
+              : pool.map((item) => ({ item, rank: 0 as const, distance: 0, field: 'word' as const, start: 0, end: item.word.length, matchText: undefined }))
             ).map((r) => (
               <WordRow
                 key={r.item.id}
@@ -114,7 +114,7 @@ export function Search() {
                 matchField={r.field}
                 matchStart={r.start}
                 matchEnd={r.end}
-                matchTag={r.tag}
+                matchText={r.matchText}
               />
             ))}
           </ul>

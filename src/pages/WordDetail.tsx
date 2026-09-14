@@ -4,6 +4,7 @@ import { ApiError, useWords } from '../state/WordsContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
+import { ExampleSentencesInput } from '../components/ui/ExampleSentencesInput'
 import { Input, TextArea } from '../components/ui/Input'
 import { OverflowMenu } from '../components/ui/OverflowMenu'
 import { TagsInput } from '../components/ui/TagsInput'
@@ -13,6 +14,7 @@ import { ArrowLeftIcon, FlagIcon } from '../components/icons'
 import { useI18n } from '../i18n/I18nContext'
 import { TYPE_ATTR_SPEC, missingRequiredAttrs } from '../lib/wordTypes'
 import { formatSince } from '../lib/relativeTime'
+import type { ExampleSentence } from '../api/types'
 
 export function WordDetail() {
   const { t } = useI18n()
@@ -30,7 +32,7 @@ export function WordDetail() {
 
   const [editWord, setEditWord] = useState('')
   const [meaning, setMeaning] = useState('')
-  const [example, setExample] = useState('')
+  const [example, setExample] = useState<ExampleSentence[]>([])
   const [tagsText, setTagsText] = useState('')
   const [source, setSource] = useState('')
   const [comment, setComment] = useState('')
@@ -41,7 +43,7 @@ export function WordDetail() {
     if (!word) return
     setEditWord(word.word)
     setMeaning(word.meaning)
-    setExample(word.example ?? '')
+    setExample(word.example)
     setTagsText(word.tags.join(', '))
     setSource(word.source ?? '')
     setComment(word.comment ?? '')
@@ -76,7 +78,7 @@ export function WordDetail() {
       await patchWord(word.id, {
         word: editWord.trim(),
         meaning: meaning.trim(),
-        example: example.trim() || null,
+        example: example.filter((ex) => ex.de.trim()).map((ex) => ({ de: ex.de.trim(), meaning: ex.meaning.trim() })),
         attrs,
         tags: tagsText
           .split(',')
@@ -156,10 +158,15 @@ export function WordDetail() {
             <p className="eyebrow text-[11px] text-ink-tertiary">{t('detail.meaning')}</p>
             <p className="text-[16px] text-ink">{word.meaning}</p>
           </div>
-          {word.example && (
-            <div>
+          {word.example.length > 0 && (
+            <div className="flex flex-col gap-2">
               <p className="eyebrow text-[11px] text-ink-tertiary">{t('detail.example')}</p>
-              <p className="text-[15px] italic text-ink-secondary">{word.example}</p>
+              {word.example.map((ex, i) => (
+                <div key={i}>
+                  <p className="text-[15px] italic text-ink-secondary">{ex.de}</p>
+                  {ex.meaning && <p className="text-[13px] text-ink-tertiary">{ex.meaning}</p>}
+                </div>
+              ))}
             </div>
           )}
           {allAttrFields.length > 0 && (
@@ -216,7 +223,14 @@ export function WordDetail() {
             setRegelmaessig={setRegelmaessig}
           />
           <TypeAttrsOptional type={word.type} attrs={attrs} setAttr={setAttr} />
-          <TextArea id="detail-example" label={t('add.example')} rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
+          <ExampleSentencesInput
+            label={t('add.example')}
+            dePlaceholder={t('add.exampleDe')}
+            meaningPlaceholder={t('add.exampleMeaning')}
+            addLabel={t('add.addExample')}
+            value={example}
+            onChange={setExample}
+          />
           <TagsInput id="detail-tags" label={t('detail.tagsLabel')} value={tagsText} onChange={setTagsText} suggestions={allTags} />
           <Input id="detail-source" label={t('detail.source')} value={source} onChange={(e) => setSource(e.target.value)} />
           <TextArea id="detail-comment" label={t('detail.comment')} rows={3} value={comment} onChange={(e) => setComment(e.target.value)} />

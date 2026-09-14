@@ -16,7 +16,7 @@ export function WordOfDayCard({ word }: { word: Word }) {
         <span className="text-[20px] font-bold text-ink">{word.word}</span>
       </div>
       <p className="text-[14px] text-ink-secondary">{word.meaning}</p>
-      {word.example && <p className="text-[13px] italic text-ink-tertiary">{word.example}</p>}
+      {word.example[0] && <p className="text-[13px] italic text-ink-tertiary">{word.example[0].de}</p>}
     </Link>
   )
 }

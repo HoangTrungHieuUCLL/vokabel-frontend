@@ -43,7 +43,7 @@ export interface Searchable {
   word: string
   search_key: string
   meaning: string
-  example: string | null
+  example: { de: string; meaning: string }[]
   tags: string[]
 }
 
@@ -54,8 +54,8 @@ export interface SearchMatch<T extends Searchable> {
   field: MatchField
   start: number
   end: number
-  /** The matched tag itself, present only when field is 'tag'. */
-  tag?: string
+  /** The matched tag or example sentence itself -- present when field is 'tag' or 'example', since those don't live directly on the item as a single string. */
+  matchText?: string
 }
 
 /** Ranks: 0 exact search_key, 1 prefix, 2 bounded Levenshtein, 3 substring in meaning/example. */
@@ -91,7 +91,7 @@ export function searchWords<T extends Searchable>(items: T[], rawQuery: string):
     const tagMatch = item.tags.find((tag) => tag.toLowerCase().includes(lowerQuery))
     if (tagMatch) {
       const idx = tagMatch.toLowerCase().indexOf(lowerQuery)
-      matches.push({ item, rank: 3, distance: 0, field: 'tag', start: idx, end: idx + query.length, tag: tagMatch })
+      matches.push({ item, rank: 3, distance: 0, field: 'tag', start: idx, end: idx + query.length, matchText: tagMatch })
       continue
     }
 
@@ -108,15 +108,17 @@ export function searchWords<T extends Searchable>(items: T[], rawQuery: string):
       continue
     }
 
-    const exampleIdx = item.example?.toLowerCase().indexOf(lowerQuery) ?? -1
-    if (exampleIdx >= 0) {
+    const exampleMatch = item.example.find((ex) => ex.de.toLowerCase().includes(lowerQuery))
+    if (exampleMatch) {
+      const idx = exampleMatch.de.toLowerCase().indexOf(lowerQuery)
       matches.push({
         item,
         rank: 3,
         distance: 0,
         field: 'example',
-        start: exampleIdx,
-        end: exampleIdx + query.length,
+        start: idx,
+        end: idx + query.length,
+        matchText: exampleMatch.de,
       })
     }
   }
