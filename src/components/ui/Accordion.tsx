@@ -1,13 +1,33 @@
 import { useState, type ReactNode } from 'react'
 import { ChevronDownIcon } from '../icons'
 
-export function Accordion({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: ReactNode }) {
-  const [open, setOpen] = useState(defaultOpen)
+interface AccordionProps {
+  title: string
+  defaultOpen?: boolean
+  /** Controlled open state -- pass together with onToggle to coordinate a single-open group. Omit for independent, self-managed accordions. */
+  open?: boolean
+  onToggle?: () => void
+  children: ReactNode
+}
+
+export function Accordion({ title, defaultOpen = false, open: openProp, onToggle, children }: AccordionProps) {
+  const [internalOpen, setInternalOpen] = useState(defaultOpen)
+  const isControlled = openProp !== undefined
+  const open = isControlled ? openProp : internalOpen
+
+  function handleClick() {
+    if (isControlled) {
+      onToggle?.()
+    } else {
+      setInternalOpen((o) => !o)
+    }
+  }
+
   return (
     <div className="sticker rounded-[var(--radius-card)] bg-surface">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={handleClick}
         aria-expanded={open}
         className="tap-target flex w-full items-center justify-between gap-2 px-4 py-3 text-left"
       >

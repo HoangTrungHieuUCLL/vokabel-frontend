@@ -123,6 +123,16 @@ export function XIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
+export function MoreIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base(props)} fill="currentColor" stroke="none">
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
+  )
+}
+
 export function LogoMark(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 32 32" {...props}>

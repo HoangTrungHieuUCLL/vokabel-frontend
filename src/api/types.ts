@@ -12,6 +12,7 @@ export interface Word {
   attrs: Record<string, unknown>
   tags: string[]
   source: string | null
+  comment: string | null
   is_hard: boolean
   hard_since: string | null
   due_at: string | null
@@ -32,6 +33,7 @@ export interface WordCreate {
   attrs?: Record<string, unknown>
   tags?: string[]
   source?: string | null
+  comment?: string | null
   is_hard?: boolean
 }
 

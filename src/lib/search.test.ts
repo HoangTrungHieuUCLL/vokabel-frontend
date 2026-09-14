@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { makeSearchKey } from './searchKey'
 import { searchWords, type Searchable } from './search'
 
-function word(id: number, w: string, meaning = '', example: string | null = null): Searchable {
-  return { id, word: w, search_key: makeSearchKey(w), meaning, example }
+function word(id: number, w: string, meaning = '', example: string | null = null, tags: string[] = []): Searchable {
+  return { id, word: w, search_key: makeSearchKey(w), meaning, example, tags }
 }
 
 describe('searchWords', () => {
@@ -52,5 +52,12 @@ describe('searchWords', () => {
     const items = [word(1, 'Buch', 'book about cooking')]
     const results = searchWords(items, 'cooking')
     expect(results[0]?.field).toBe('meaning')
+  })
+
+  it('finds a word by tag name', () => {
+    const items = [word(1, 'Buch', 'book', null, ['b1-exam'])]
+    const results = searchWords(items, 'b1-exam')
+    expect(results[0]?.field).toBe('tag')
+    expect(results[0]?.tag).toBe('b1-exam')
   })
 })

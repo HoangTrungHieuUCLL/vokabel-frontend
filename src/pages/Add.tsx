@@ -30,6 +30,7 @@ export function Add() {
   const [example, setExample] = useState('')
   const [tagsText, setTagsText] = useState('')
   const [source, setSource] = useState('')
+  const [comment, setComment] = useState('')
   const [isHard, setIsHard] = useState(false)
   const [attrs, setAttrs] = useState<Record<string, unknown>>({})
   const [regelmaessig, setRegelmaessig] = useState(false)
@@ -58,6 +59,7 @@ export function Add() {
     setExample('')
     setTagsText('')
     setSource('')
+    setComment('')
     setIsHard(false)
     setAttrs({})
     setRegelmaessig(false)
@@ -89,6 +91,7 @@ export function Add() {
           .map((t) => t.trim())
           .filter(Boolean),
         source: source.trim() || null,
+        comment: comment.trim() || null,
         is_hard: isHard,
       })
       resetForm()
@@ -154,6 +157,7 @@ export function Add() {
           <TextArea id="add-example" label={t('add.example')} rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
           <TagsInput id="add-tags" label={t('add.tags')} value={tagsText} onChange={setTagsText} suggestions={allTags} />
           <Input id="add-source" label={t('add.source')} value={source} onChange={(e) => setSource(e.target.value)} />
+          <TextArea id="add-comment" label={t('add.comment')} rows={2} value={comment} onChange={(e) => setComment(e.target.value)} />
         </div>
       )}
 

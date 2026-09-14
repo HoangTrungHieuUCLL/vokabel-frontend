@@ -17,6 +17,7 @@ const TARGET_FIELDS: { key: string; labelKey: TranslationKey }[] = [
   { key: 'example', labelKey: 'import.fieldExample' },
   { key: 'tags', labelKey: 'import.fieldTags' },
   { key: 'source', labelKey: 'import.fieldSource' },
+  { key: 'comment', labelKey: 'import.fieldComment' },
 ]
 
 const POLICIES: { value: ImportPolicy; labelKey: TranslationKey; hintKey: TranslationKey }[] = [

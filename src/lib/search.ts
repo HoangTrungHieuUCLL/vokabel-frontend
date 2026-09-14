@@ -36,7 +36,7 @@ export function boundedLevenshtein(a: string, b: string, maxDistance: number): n
   return prevRow[b.length]
 }
 
-export type MatchField = 'word' | 'meaning' | 'example'
+export type MatchField = 'word' | 'meaning' | 'example' | 'tag'
 
 export interface Searchable {
   id: number
@@ -44,6 +44,7 @@ export interface Searchable {
   search_key: string
   meaning: string
   example: string | null
+  tags: string[]
 }
 
 export interface SearchMatch<T extends Searchable> {
@@ -53,6 +54,8 @@ export interface SearchMatch<T extends Searchable> {
   field: MatchField
   start: number
   end: number
+  /** The matched tag itself, present only when field is 'tag'. */
+  tag?: string
 }
 
 /** Ranks: 0 exact search_key, 1 prefix, 2 bounded Levenshtein, 3 substring in meaning/example. */
@@ -83,6 +86,13 @@ export function searchWords<T extends Searchable>(items: T[], rawQuery: string):
         matches.push({ item, rank: 2, distance, field: 'word', start: 0, end: item.word.length })
         continue
       }
+    }
+
+    const tagMatch = item.tags.find((tag) => tag.toLowerCase().includes(lowerQuery))
+    if (tagMatch) {
+      const idx = tagMatch.toLowerCase().indexOf(lowerQuery)
+      matches.push({ item, rank: 3, distance: 0, field: 'tag', start: idx, end: idx + query.length, tag: tagMatch })
+      continue
     }
 
     const meaningIdx = item.meaning.toLowerCase().indexOf(lowerQuery)

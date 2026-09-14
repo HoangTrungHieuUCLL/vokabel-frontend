@@ -5,10 +5,11 @@ import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { Input, TextArea } from '../components/ui/Input'
+import { OverflowMenu } from '../components/ui/OverflowMenu'
 import { TagsInput } from '../components/ui/TagsInput'
 import { TypeChip } from '../components/ui/TypeChip'
 import { TypeAttrsOptional, TypeAttrsRequired } from '../components/TypeAttrsFields'
-import { ArrowLeftIcon, FlagIcon, TrashIcon } from '../components/icons'
+import { ArrowLeftIcon, FlagIcon } from '../components/icons'
 import { useI18n } from '../i18n/I18nContext'
 import { TYPE_ATTR_SPEC, missingRequiredAttrs } from '../lib/wordTypes'
 import { formatSince } from '../lib/relativeTime'
@@ -32,6 +33,7 @@ export function WordDetail() {
   const [example, setExample] = useState('')
   const [tagsText, setTagsText] = useState('')
   const [source, setSource] = useState('')
+  const [comment, setComment] = useState('')
   const [attrs, setAttrs] = useState<Record<string, unknown>>({})
   const [regelmaessig, setRegelmaessig] = useState(false)
 
@@ -42,6 +44,7 @@ export function WordDetail() {
     setExample(word.example ?? '')
     setTagsText(word.tags.join(', '))
     setSource(word.source ?? '')
+    setComment(word.comment ?? '')
     setAttrs(word.attrs)
   }, [word])
 
@@ -80,6 +83,7 @@ export function WordDetail() {
           .map((t) => t.trim())
           .filter(Boolean),
         source: source.trim() || null,
+        comment: comment.trim() || null,
       })
       setEditing(false)
     } catch (err) {
@@ -108,9 +112,25 @@ export function WordDetail() {
         <ArrowLeftIcon className="h-5 w-5" /> {t('detail.back')}
       </Link>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <TypeChip type={word.type} size="md" showLabel />
-        <h1 className="headline min-w-0 break-words text-[28px]">{word.word}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
+          <TypeChip type={word.type} size="md" showLabel />
+          {word.type === 'nomen' && typeof word.attrs.artikel === 'string' && (
+            <span className="rounded-full bg-accent px-2.5 py-1 font-display text-[14px] font-extrabold uppercase tracking-[0.03em] text-white">
+              {word.attrs.artikel as string}
+            </span>
+          )}
+          <h1 className="headline min-w-0 break-words text-[28px]">{word.word}</h1>
+        </div>
+        {!editing && (
+          <OverflowMenu
+            ariaLabel={t('detail.moreActions')}
+            items={[
+              { label: t('detail.edit'), onClick: () => setEditing(true) },
+              { label: t('detail.delete'), onClick: () => setConfirmingDelete(true), danger: true },
+            ]}
+          />
+        )}
       </div>
 
       <button
@@ -156,6 +176,12 @@ export function WordDetail() {
               })}
             </div>
           )}
+          {word.comment && (
+            <div>
+              <p className="eyebrow text-[11px] text-ink-tertiary">{t('detail.comment')}</p>
+              <p className="whitespace-pre-wrap text-[15px] text-ink-secondary">{word.comment}</p>
+            </div>
+          )}
           {word.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {word.tags.map((tag) => (
@@ -193,32 +219,22 @@ export function WordDetail() {
           <TextArea id="detail-example" label={t('add.example')} rows={2} value={example} onChange={(e) => setExample(e.target.value)} />
           <TagsInput id="detail-tags" label={t('detail.tagsLabel')} value={tagsText} onChange={setTagsText} suggestions={allTags} />
           <Input id="detail-source" label={t('detail.source')} value={source} onChange={(e) => setSource(e.target.value)} />
+          <TextArea id="detail-comment" label={t('detail.comment')} rows={3} value={comment} onChange={(e) => setComment(e.target.value)} />
           {saveError && <p className="text-[13px] font-semibold text-negative-text">{saveError}</p>}
           {missing.length > 0 && <p className="text-[12px] font-semibold text-ink-tertiary">{missing.join(', ')} {t('add.missingSuffix')}</p>}
         </div>
       )}
 
-      <div className="flex gap-2">
-        {editing ? (
-          <>
-            <Button variant="secondary" className="flex-1" onClick={() => setEditing(false)} disabled={saving}>
-              {t('detail.cancel')}
-            </Button>
-            <Button className="flex-1" onClick={handleSave} disabled={saving || missing.length > 0}>
-              {saving ? t('add.saving') : t('add.save')}
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button variant="secondary" className="flex-1" onClick={() => setEditing(true)}>
-              {t('detail.edit')}
-            </Button>
-            <Button variant="danger" className="flex-1" onClick={() => setConfirmingDelete(true)}>
-              <TrashIcon className="h-4 w-4" /> {t('detail.delete')}
-            </Button>
-          </>
-        )}
-      </div>
+      {editing && (
+        <div className="flex gap-2">
+          <Button variant="secondary" className="flex-1" onClick={() => setEditing(false)} disabled={saving}>
+            {t('detail.cancel')}
+          </Button>
+          <Button className="flex-1" onClick={handleSave} disabled={saving || missing.length > 0}>
+            {saving ? t('add.saving') : t('add.save')}
+          </Button>
+        </div>
+      )}
 
       {confirmingDelete && (
         <ConfirmDialog

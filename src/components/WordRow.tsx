@@ -11,6 +11,7 @@ interface WordRowProps {
   matchField?: MatchField
   matchStart?: number
   matchEnd?: number
+  matchTag?: string
 }
 
 function Highlighted({ text, start, end }: { text: string; start: number; end: number }) {
@@ -24,10 +25,12 @@ function Highlighted({ text, start, end }: { text: string; start: number; end: n
   )
 }
 
-export function WordRow({ word, onToggleHard, matchField, matchStart, matchEnd }: WordRowProps) {
+export function WordRow({ word, onToggleHard, matchField, matchStart, matchEnd, matchTag }: WordRowProps) {
   const { t } = useI18n()
   const meaningHighlighted = matchField === 'meaning' && matchStart !== undefined && matchEnd !== undefined
   const exampleHighlighted = matchField === 'example' && matchStart !== undefined && matchEnd !== undefined
+  const tagHighlighted = matchField === 'tag' && matchTag !== undefined && matchStart !== undefined && matchEnd !== undefined
+  const artikel = word.type === 'nomen' ? (word.attrs.artikel as string | undefined) : undefined
 
   return (
     <li>
@@ -37,7 +40,14 @@ export function WordRow({ word, onToggleHard, matchField, matchStart, matchEnd }
       >
         <TypeChip type={word.type} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] font-bold text-ink">{word.word}</p>
+          <p className="truncate text-[15px] font-bold text-ink">
+            {artikel && (
+              <span className="mr-1.5 inline-block rounded-full bg-accent px-1.5 py-0.5 align-middle text-[10px] font-extrabold uppercase text-white">
+                {artikel}
+              </span>
+            )}
+            {word.word}
+          </p>
           <p className="truncate text-[13px] text-ink-secondary">
             {meaningHighlighted ? (
               <Highlighted text={word.meaning} start={matchStart} end={matchEnd} />
@@ -48,6 +58,12 @@ export function WordRow({ word, onToggleHard, matchField, matchStart, matchEnd }
               <>
                 {' — '}
                 <Highlighted text={word.example} start={matchStart} end={matchEnd} />
+              </>
+            )}
+            {!meaningHighlighted && tagHighlighted && (
+              <>
+                {' — #'}
+                <Highlighted text={matchTag} start={matchStart} end={matchEnd} />
               </>
             )}
           </p>
