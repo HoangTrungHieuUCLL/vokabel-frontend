@@ -70,3 +70,33 @@ export interface ImportCommitResult {
   errors: { row: number; reason: string }[]
   rolled_back?: boolean
 }
+
+export interface Spotlight {
+  /** Local wall-clock slot this word belongs to, e.g. "12:00". */
+  slot: string
+  slot_date: string
+  scheduled_for: string
+  next_slot_at: string | null
+  word: Word
+}
+
+export interface NotificationStatus {
+  push_enabled: boolean
+  subscribed: boolean
+  subscription_count: number
+  slots: string[]
+  timezone: string
+  next_slot_at: string | null
+}
+
+export interface VapidKey {
+  public_key: string
+  push_enabled: boolean
+}
+
+export interface PushSendResult {
+  sent: number
+  failed: number
+  removed: number
+  subscriptions: number
+}

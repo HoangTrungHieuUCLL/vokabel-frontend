@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
+import { NotificationSettings } from '../components/settings/NotificationSettings'
 import { TypeChip } from '../components/ui/TypeChip'
 import { UploadIcon } from '../components/icons'
 import { useI18n } from '../i18n/I18nContext'
@@ -50,6 +51,8 @@ export function Settings() {
           ))}
         </div>
       </Card>
+
+      <NotificationSettings />
 
       <Card className="flex flex-col gap-3">
         <p className="eyebrow text-[12px]">{t('settings.wordsByType')}</p>

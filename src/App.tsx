@@ -5,6 +5,7 @@ import { RequireAuth } from './auth/RouteGuards'
 import { I18nProvider } from './i18n/I18nContext'
 import { Add } from './pages/Add'
 import { Grammar } from './pages/Grammar'
+import { History } from './pages/History'
 import { Import } from './pages/Import'
 import { Login } from './pages/Login'
 import { Search } from './pages/Search'
@@ -32,6 +33,7 @@ export default function App() {
                   <Route path="/" element={<Search />} />
                   <Route path="/add" element={<Add />} />
                   <Route path="/word/:id" element={<WordDetail />} />
+                  <Route path="/history" element={<History />} />
                   <Route path="/grammar" element={<Grammar />} />
                   <Route path="/import" element={<Import />} />
                   <Route path="/tabellen" element={<Tabellen />} />
