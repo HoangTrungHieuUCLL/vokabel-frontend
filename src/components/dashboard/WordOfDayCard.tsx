@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Spotlight } from '../../api/types'
 import { useI18n } from '../../i18n/I18nContext'
+import { artikelOf } from '../../lib/artikel'
 import { formatSlotTime } from '../../lib/push'
 import { TypeChip } from '../ui/TypeChip'
 
@@ -27,7 +28,7 @@ export function WordOfDayCard({ spotlight }: { spotlight: Spotlight }) {
         )}
       </span>
       <div className="flex items-center gap-2">
-        <TypeChip type={word.type} />
+        <TypeChip type={word.type} artikel={artikelOf(word)} />
         <span className="text-[20px] font-bold text-ink">{word.word}</span>
       </div>
       <p className="text-[14px] text-ink-secondary">{word.meaning}</p>

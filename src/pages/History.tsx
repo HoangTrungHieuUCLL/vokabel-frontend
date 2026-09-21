@@ -2,20 +2,22 @@ import { useMemo, useState } from 'react'
 import { TypeFilterChips } from '../components/history/TypeFilterChips'
 import { WordRow } from '../components/WordRow'
 import { useI18n } from '../i18n/I18nContext'
-import { typeCountsDescending } from '../lib/stats'
-import type { WordType } from '../lib/wordTypes'
+import { wordFacetKey } from '../lib/artikel'
+import { facetCountsDescending } from '../lib/stats'
 import { useWords } from '../state/WordsContext'
 
 export function History() {
   const { t } = useI18n()
   const { words, loading, toggleHard } = useWords()
-  const [selected, setSelected] = useState<WordType | null>(null)
+  const [selected, setSelected] = useState<string | null>(null)
 
-  const counts = useMemo(() => typeCountsDescending(words), [words])
+  const counts = useMemo(() => facetCountsDescending(words), [words])
   // `words` arrives newest-first from WordsContext, so filtering preserves the
   // recency order a history view wants without a second sort.
   const visible = useMemo(
-    () => (selected === null ? words : words.filter((w) => w.type === selected)),
+    // Filtering goes through the same wordFacetKey the counts do, so a chip's
+    // number can never disagree with the list it opens.
+    () => (selected === null ? words : words.filter((w) => wordFacetKey(w) === selected)),
     [words, selected],
   )
 

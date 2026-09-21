@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Word } from '../api/types'
 import { useI18n } from '../i18n/I18nContext'
+import { ARTIKEL_COLOR_VAR, artikelOf } from '../lib/artikel'
 import type { MatchField } from '../lib/search'
 import { TypeChip } from './ui/TypeChip'
 import { FlagIcon } from './icons'
@@ -30,7 +31,7 @@ export function WordRow({ word, onToggleHard, matchField, matchStart, matchEnd, 
   const meaningHighlighted = matchField === 'meaning' && matchStart !== undefined && matchEnd !== undefined
   const exampleHighlighted = matchField === 'example' && matchText !== undefined && matchStart !== undefined && matchEnd !== undefined
   const tagHighlighted = matchField === 'tag' && matchText !== undefined && matchStart !== undefined && matchEnd !== undefined
-  const artikel = word.type === 'nomen' ? (word.attrs.artikel as string | undefined) : undefined
+  const artikel = artikelOf(word)
 
   return (
     <li>
@@ -38,11 +39,14 @@ export function WordRow({ word, onToggleHard, matchField, matchStart, matchEnd, 
         to={`/word/${word.id}`}
         className="tap-target flex items-center gap-3 rounded-[var(--radius-control)] border-2 border-ink bg-surface px-3 py-2 press"
       >
-        <TypeChip type={word.type} />
+        <TypeChip type={word.type} artikel={artikel} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-bold text-ink">
             {artikel && (
-              <span className="mr-1.5 inline-block rounded-full bg-accent px-1.5 py-0.5 align-middle text-[10px] font-extrabold uppercase text-white">
+              <span
+                className="mr-1.5 inline-block rounded-full px-1.5 py-0.5 align-middle text-[10px] font-extrabold uppercase text-white"
+                style={{ background: `var(${ARTIKEL_COLOR_VAR[artikel]})` }}
+              >
                 {artikel}
               </span>
             )}
