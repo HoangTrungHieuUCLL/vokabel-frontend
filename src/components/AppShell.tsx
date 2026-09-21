@@ -2,7 +2,7 @@ import type { ComponentType, SVGProps } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nContext'
 import { useWords } from '../state/WordsContext'
-import { BookIcon, GraduationCapIcon, LogoMark, PlusIcon, SearchIcon, SettingsIcon } from './icons'
+import { BookIcon, GraduationCapIcon, HistoryIcon, LogoMark, PlusIcon, SearchIcon, SettingsIcon } from './icons'
 import { Toast } from './ui/Toast'
 import type { TranslationKey } from '../i18n/translations'
 
@@ -15,6 +15,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { to: '/', labelKey: 'nav.search', Icon: SearchIcon },
   { to: '/add', labelKey: 'nav.add', Icon: PlusIcon },
+  { to: '/history', labelKey: 'nav.history', Icon: HistoryIcon },
   { to: '/tabellen', labelKey: 'nav.tabellen', Icon: BookIcon },
   { to: '/grammar', labelKey: 'nav.grammar', Icon: GraduationCapIcon },
 ]

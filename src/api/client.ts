@@ -2,6 +2,10 @@ import type {
   ImportCommitResult,
   ImportPolicy,
   ImportPreview,
+  NotificationStatus,
+  PushSendResult,
+  Spotlight,
+  VapidKey,
   Word,
   WordCreate,
   WordUpdate,
@@ -97,6 +101,44 @@ export function updateWord(id: number, body: WordUpdate): Promise<Word> {
 
 export function deleteWord(id: number): Promise<void> {
   return request(`/words/${id}`, { method: 'DELETE' })
+}
+
+export function getSpotlight(): Promise<Spotlight> {
+  return request('/spotlight')
+}
+
+export function getVapidKey(): Promise<VapidKey> {
+  return request('/notifications/vapid-key')
+}
+
+export function getNotificationStatus(endpoint?: string): Promise<NotificationStatus> {
+  const qs = endpoint ? `?endpoint=${encodeURIComponent(endpoint)}` : ''
+  return request(`/notifications/status${qs}`)
+}
+
+export function subscribePush(
+  subscription: PushSubscriptionJSON,
+  userAgent: string,
+): Promise<NotificationStatus> {
+  return request('/notifications/subscribe', {
+    method: 'POST',
+    body: JSON.stringify({
+      endpoint: subscription.endpoint,
+      keys: subscription.keys,
+      user_agent: userAgent,
+    }),
+  })
+}
+
+export function unsubscribePush(endpoint: string): Promise<void> {
+  return request('/notifications/unsubscribe', {
+    method: 'POST',
+    body: JSON.stringify({ endpoint }),
+  })
+}
+
+export function sendTestNotification(): Promise<PushSendResult> {
+  return request('/notifications/test', { method: 'POST' })
 }
 
 export function importPreview(file: File): Promise<ImportPreview> {

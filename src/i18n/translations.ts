@@ -7,6 +7,7 @@ const de = {
   'nav.add': 'Add',
   'nav.tabellen': 'Tabellen',
   'nav.grammar': 'Grammatik',
+  'nav.history': 'Verlauf',
   'nav.settings': 'Einstellungen',
 
   'login.tagline': 'Deutsch lernen, ein Wort nach dem anderen.',
@@ -22,10 +23,35 @@ const de = {
   'search.noResults': 'Keine Treffer.',
   'search.toggleHardAria': 'schwer zu merken umschalten',
 
-  'dashboard.wordOfDay': 'Wort des Tages',
+  'dashboard.spotlight': 'Aktuelles Wort',
+  'dashboard.nextWord': 'Nächstes Wort um',
   'dashboard.byType': 'Wörter nach Typ',
   'dashboard.addedPerDay': 'Neue Wörter (letzte 30 Tage)',
   'dashboard.addedTotal': 'in den letzten 30 Tagen',
+
+  'history.title': 'Verlauf',
+  'history.all': 'Alle',
+  'history.record': 'Eintrag',
+  'history.records': 'Einträge',
+
+  'notify.title': 'Benachrichtigungen',
+  'notify.description': 'Fünfmal täglich ein Wort aufs Handy.',
+  'notify.slotsLabel': 'Zeiten',
+  'notify.enable': 'Benachrichtigungen aktivieren',
+  'notify.disable': 'Deaktivieren',
+  'notify.enabled': 'Auf diesem Gerät aktiv.',
+  'notify.working': 'Einen Moment…',
+  'notify.blocked':
+    'Benachrichtigungen sind für diese Seite blockiert. Erlaube sie in den Einstellungen deines Browsers.',
+  'notify.unsupported': 'Dieser Browser unterstützt keine Push-Benachrichtigungen.',
+  'notify.iosInstall':
+    'Auf dem iPhone geht das nur, wenn die App auf dem Home-Bildschirm liegt: In Safari auf „Teilen" tippen, dann „Zum Home-Bildschirm". Danach die App von dort öffnen und hier aktivieren.',
+  'notify.serverDisabled': 'Der Server hat noch keine Push-Schlüssel. Siehe README.',
+  'notify.test': 'Testbenachrichtigung senden',
+  'notify.testSent': 'Testbenachrichtigung gesendet.',
+  'notify.testNoDevices': 'Kein Gerät ist angemeldet.',
+  'notify.failed': 'Hat nicht geklappt. Bitte noch einmal versuchen.',
+  'notify.otherDevices': 'weitere Geräte angemeldet',
 
   'add.title': 'Wort hinzufügen',
   'add.wordLabel': 'Wort',
@@ -227,6 +253,7 @@ const en: Record<Key, string> = {
   'nav.add': 'Add',
   'nav.tabellen': 'Tables',
   'nav.grammar': 'Grammar',
+  'nav.history': 'History',
   'nav.settings': 'Settings',
 
   'login.tagline': 'Learn German, one word at a time.',
@@ -242,10 +269,34 @@ const en: Record<Key, string> = {
   'search.noResults': 'No matches.',
   'search.toggleHardAria': 'toggle hard-to-remember',
 
-  'dashboard.wordOfDay': 'Word of the day',
+  'dashboard.spotlight': 'Current word',
+  'dashboard.nextWord': 'Next word at',
   'dashboard.byType': 'Words by type',
   'dashboard.addedPerDay': 'New words (last 30 days)',
   'dashboard.addedTotal': 'in the last 30 days',
+
+  'history.title': 'History',
+  'history.all': 'All',
+  'history.record': 'record',
+  'history.records': 'records',
+
+  'notify.title': 'Notifications',
+  'notify.description': 'A word on your phone five times a day.',
+  'notify.slotsLabel': 'Times',
+  'notify.enable': 'Enable notifications',
+  'notify.disable': 'Disable',
+  'notify.enabled': 'Active on this device.',
+  'notify.working': 'One moment…',
+  'notify.blocked': 'Notifications are blocked for this site. Allow them in your browser settings.',
+  'notify.unsupported': 'This browser does not support push notifications.',
+  'notify.iosInstall':
+    'On iPhone this only works once the app is on your home screen: in Safari tap Share, then "Add to Home Screen". Open the app from there and enable it here.',
+  'notify.serverDisabled': 'The server has no push keys yet. See the README.',
+  'notify.test': 'Send a test notification',
+  'notify.testSent': 'Test notification sent.',
+  'notify.testNoDevices': 'No device is subscribed.',
+  'notify.failed': "That didn't work. Please try again.",
+  'notify.otherDevices': 'other devices subscribed',
 
   'add.title': 'Add word',
   'add.wordLabel': 'Word',

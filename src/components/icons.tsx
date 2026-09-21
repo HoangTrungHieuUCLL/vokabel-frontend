@@ -133,6 +133,36 @@ export function MoreIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
+export function HistoryIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base(props)}>
+      <path d="M3 12a9 9 0 1 0 2.64-6.36" />
+      <polyline points="3 4 3 9 8 9" />
+      <polyline points="12 7 12 12 15.5 14" />
+    </svg>
+  )
+}
+
+export function BellIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base(props)}>
+      <path d="M18 8a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6" />
+      <path d="M10.5 20a1.8 1.8 0 0 0 3 0" />
+    </svg>
+  )
+}
+
+export function BellOffIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base(props)}>
+      <path d="M8.3 4.3A6 6 0 0 1 18 8c0 2.2.4 3.7.9 4.7" />
+      <path d="M16.2 16.2H4s2-1 2-6c0-.8.2-1.6.5-2.3" />
+      <path d="M10.5 20a1.8 1.8 0 0 0 3 0" />
+      <line x1="3" y1="3" x2="21" y2="21" />
+    </svg>
+  )
+}
+
 export function LogoMark(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 32 32" {...props}>

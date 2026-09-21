@@ -7,9 +7,10 @@ import { Card } from '../components/ui/Card'
 import { SearchIcon } from '../components/icons'
 import { useI18n } from '../i18n/I18nContext'
 import { searchWords } from '../lib/search'
-import { countsByType, pickWordOfDay, wordsAddedByDay } from '../lib/stats'
+import { countsByType, wordsAddedByDay } from '../lib/stats'
 import { useDebouncedValue } from '../lib/useDebouncedValue'
 import { useWords } from '../state/WordsContext'
+import { useSpotlight } from '../state/useSpotlight'
 
 export function Search() {
   const { t } = useI18n()
@@ -35,7 +36,9 @@ export function Search() {
     return searchWords(pool, debouncedQuery)
   }, [pool, debouncedQuery])
 
-  const wordOfDay = useMemo(() => pickWordOfDay(words), [words])
+  // Re-fetched when the collection changes, so the first word added shows up
+  // straight away instead of after a reload.
+  const spotlight = useSpotlight(words.length)
   const typeCounts = useMemo(() => countsByType(words), [words])
   const dailyCounts = useMemo(() => wordsAddedByDay(words, 30), [words])
   const addedTotal = useMemo(() => dailyCounts.reduce((sum, d) => sum + d.count, 0), [dailyCounts])
@@ -82,7 +85,7 @@ export function Search() {
 
       {showDashboard ? (
         <div className="flex flex-col gap-4">
-          {wordOfDay && <WordOfDayCard word={wordOfDay} />}
+          {spotlight && <WordOfDayCard spotlight={spotlight} />}
 
           <Card className="flex flex-col gap-2">
             <p className="eyebrow text-[12px] text-ink-tertiary">{t('dashboard.byType')}</p>
