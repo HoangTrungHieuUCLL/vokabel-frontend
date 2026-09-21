@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import { RequireAuth } from './auth/RouteGuards'
@@ -8,7 +8,6 @@ import { Grammar } from './pages/Grammar'
 import { History } from './pages/History'
 import { Import } from './pages/Import'
 import { Login } from './pages/Login'
-import { Search } from './pages/Search'
 import { Settings } from './pages/Settings'
 import { Tabellen } from './pages/Tabellen'
 import { WordDetail } from './pages/WordDetail'
@@ -30,7 +29,9 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route element={<RequireAuth />}>
                 <Route element={<AppShell />}>
-                  <Route path="/" element={<Search />} />
+                  {/* Search is no longer a tab -- the bar lives in the shell
+                      and is available from every page. */}
+                  <Route path="/" element={<Navigate to="/add" replace />} />
                   <Route path="/add" element={<Add />} />
                   <Route path="/word/:id" element={<WordDetail />} />
                   <Route path="/history" element={<History />} />

@@ -1,5 +1,5 @@
 import type { Word } from '../api/types'
-import { FACET_ORDER, facetArtikelOf, facetTypeOf, wordFacetKey, type Artikel } from './artikel'
+import { ARTIKEL, artikelOf, type Artikel } from './artikel'
 import { WORD_TYPES, type WordType } from './wordTypes'
 
 function localDateKey(d: Date): string {
@@ -35,37 +35,59 @@ export function wordsAddedByDay(words: Word[], days: number, today: Date = new D
   return result
 }
 
-export interface FacetCount {
-  /** Either a word type, or "nomen:der" / "nomen:die" / "nomen:das". */
-  key: string
-  type: WordType
-  artikel: Artikel | null
+export interface ArtikelCount {
+  artikel: Artikel
   count: number
 }
 
+export interface NounFacet {
+  kind: 'nouns'
+  /** Every noun, including any that predate the required-article rule. */
+  count: number
+  /** Only the genders actually present, most words first. */
+  genders: ArtikelCount[]
+}
+
+export interface TypeFacet {
+  kind: 'type'
+  type: WordType
+  count: number
+}
+
+export type HistoryFacet = NounFacet | TypeFacet
+
 /**
- * The facets present in the collection, most words first -- the order the
- * History filter row renders left to right. Nouns are split by gender, so
- * "der" and "die" are ranked against each other and against the other types
- * rather than lumped into one Nomen bucket.
+ * The facets the History filter row renders, left to right, most words first.
+ *
+ * Nouns are one grouped facet rather than three loose chips: the group shows
+ * the noun total and its der/die/das split together, and it is ranked among
+ * the other types by that total.
  *
  * A facet with no words is left out rather than shown as an unusable "0"
- * chip. Ties fall back to the fixed facet order so the row stays put between
+ * chip. Ties fall back to the fixed type order so the row stays put between
  * renders instead of reshuffling whenever two facets are level.
  */
-export function facetCountsDescending(words: Word[]): FacetCount[] {
-  const counts = new Map<string, number>()
+export function historyFacets(words: Word[]): HistoryFacet[] {
+  const byType = countsByType(words)
+  const byArtikel = new Map<Artikel, number>()
   for (const word of words) {
-    const key = wordFacetKey(word)
-    counts.set(key, (counts.get(key) ?? 0) + 1)
+    const artikel = artikelOf(word)
+    if (artikel) byArtikel.set(artikel, (byArtikel.get(artikel) ?? 0) + 1)
   }
 
-  return [...counts.entries()]
-    .map(([key, count]) => ({
-      key,
-      type: facetTypeOf(key),
-      artikel: facetArtikelOf(key),
-      count,
-    }))
-    .sort((a, b) => b.count - a.count || FACET_ORDER.indexOf(a.key) - FACET_ORDER.indexOf(b.key))
+  const facets: HistoryFacet[] = WORD_TYPES.filter((type) => byType[type] > 0).map((type) =>
+    type === 'nomen'
+      ? {
+          kind: 'nouns',
+          count: byType.nomen,
+          genders: ARTIKEL.map((artikel) => ({ artikel, count: byArtikel.get(artikel) ?? 0 }))
+            .filter(({ count }) => count > 0)
+            .sort((a, b) => b.count - a.count || ARTIKEL.indexOf(a.artikel) - ARTIKEL.indexOf(b.artikel)),
+        }
+      : { kind: 'type', type, count: byType[type] },
+  )
+
+  // Stable index so equal counts never reshuffle between renders.
+  const orderOf = (f: HistoryFacet) => WORD_TYPES.indexOf(f.kind === 'nouns' ? 'nomen' : f.type)
+  return facets.sort((a, b) => b.count - a.count || orderOf(a) - orderOf(b))
 }

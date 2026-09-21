@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ApiError, useWords } from '../state/WordsContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
@@ -22,6 +22,30 @@ export function WordDetail() {
   const { id } = useParams<{ id: string }>()
   const wordId = Number(id)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  /**
+   * Go back where you came from rather than always to one fixed tab.
+   *
+   * React Router marks the session's first entry with key "default". A word
+   * opened straight from a notification is that first entry, so there is
+   * nothing to go back to and History -- the list this word belongs to -- is
+   * the sensible landing spot instead.
+   */
+  const goBack = () => {
+    if (location.key === 'default') navigate('/history', { replace: true })
+    else navigate(-1)
+  }
+
+  const backButton = (
+    <button
+      type="button"
+      onClick={goBack}
+      className="tap-target inline-flex w-fit items-center gap-2 text-ink-secondary"
+    >
+      <ArrowLeftIcon className="h-5 w-5" /> {t('detail.back')}
+    </button>
+  )
   const { getWord, patchWord, scheduleDelete, toggleHard, loading, words } = useWords()
   const word = getWord(wordId)
   const allTags = useMemo(() => Array.from(new Set(words.flatMap((w) => w.tags))).sort(), [words])
@@ -54,9 +78,7 @@ export function WordDetail() {
   if (!word) {
     return (
       <div className="flex flex-col gap-4">
-        <Link to="/" className="tap-target inline-flex w-fit items-center gap-2 text-ink-secondary">
-          <ArrowLeftIcon className="h-5 w-5" /> {t('detail.back')}
-        </Link>
+        {backButton}
         <p className="text-[14px] text-ink-tertiary">{loading ? t('search.loading') : t('detail.notFound')}</p>
       </div>
     )
@@ -103,7 +125,9 @@ export function WordDetail() {
   function handleDelete() {
     setConfirmingDelete(false)
     scheduleDelete(word!.id)
-    navigate('/')
+    // Back to the list the word was in, not wherever the browser history
+    // happens to point -- the undo toast lives there.
+    navigate('/history')
   }
 
   const artikel = artikelOf(word)
@@ -112,9 +136,7 @@ export function WordDetail() {
 
   return (
     <div className="flex flex-col gap-5">
-      <Link to="/" className="tap-target inline-flex w-fit items-center gap-2 text-ink-secondary">
-        <ArrowLeftIcon className="h-5 w-5" /> {t('detail.back')}
-      </Link>
+      {backButton}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-3">

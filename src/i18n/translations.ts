@@ -3,7 +3,6 @@
 // below) and a missing translation is a compile error, not a silent
 // fallback to German at runtime.
 const de = {
-  'nav.search': 'Suche',
   'nav.add': 'Add',
   'nav.tabellen': 'Tabellen',
   'nav.grammar': 'Grammatik',
@@ -22,12 +21,10 @@ const de = {
   'search.emptyDb': 'Noch keine Wörter — leg direkt auf „Add" los.',
   'search.noResults': 'Keine Treffer.',
   'search.toggleHardAria': 'schwer zu merken umschalten',
+  'search.clear': 'Suche leeren',
 
-  'dashboard.spotlight': 'Aktuelles Wort',
-  'dashboard.nextWord': 'Nächstes Wort um',
   'dashboard.byType': 'Wörter nach Typ',
   'dashboard.addedPerDay': 'Neue Wörter (letzte 30 Tage)',
-  'dashboard.addedTotal': 'in den letzten 30 Tagen',
 
   'history.title': 'Verlauf',
   'history.all': 'Alle',
@@ -249,7 +246,6 @@ const de = {
 type Key = keyof typeof de
 
 const en: Record<Key, string> = {
-  'nav.search': 'Search',
   'nav.add': 'Add',
   'nav.tabellen': 'Tables',
   'nav.grammar': 'Grammar',
@@ -268,12 +264,10 @@ const en: Record<Key, string> = {
   'search.emptyDb': 'No words yet — head straight to "Add".',
   'search.noResults': 'No matches.',
   'search.toggleHardAria': 'toggle hard-to-remember',
+  'search.clear': 'Clear search',
 
-  'dashboard.spotlight': 'Current word',
-  'dashboard.nextWord': 'Next word at',
   'dashboard.byType': 'Words by type',
   'dashboard.addedPerDay': 'New words (last 30 days)',
-  'dashboard.addedTotal': 'in the last 30 days',
 
   'history.title': 'History',
   'history.all': 'All',

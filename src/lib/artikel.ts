@@ -1,5 +1,5 @@
 import type { Word } from '../api/types'
-import { WORD_TYPES, type WordType } from './wordTypes'
+import type { WordType } from './wordTypes'
 
 export const ARTIKEL = ['der', 'die', 'das'] as const
 
@@ -41,6 +41,17 @@ export function wordFacetKey(word: Pick<Word, 'type' | 'attrs'>): string {
   return artikel ? `nomen:${artikel}` : word.type
 }
 
+/**
+ * Whether a word belongs under a filter key.
+ *
+ * The bare "nomen" key means every noun, gendered or not -- it backs the
+ * total on the noun chip group. The gendered keys narrow to one article.
+ */
+export function matchesFacet(word: Pick<Word, 'type' | 'attrs'>, key: string): boolean {
+  if (key === 'nomen') return word.type === 'nomen'
+  return wordFacetKey(word) === key
+}
+
 export function facetTypeOf(key: string): WordType {
   return key.startsWith('nomen:') ? 'nomen' : (key as WordType)
 }
@@ -49,11 +60,3 @@ export function facetArtikelOf(key: string): Artikel | null {
   const [, artikel] = key.split(':')
   return isArtikel(artikel) ? artikel : null
 }
-
-/**
- * Canonical facet order, used only to break count ties so the chip row keeps
- * a stable position instead of reshuffling when two facets are level.
- */
-export const FACET_ORDER: string[] = WORD_TYPES.flatMap((type) =>
-  type === 'nomen' ? [...ARTIKEL.map((a) => `nomen:${a}`), 'nomen'] : [type],
-)

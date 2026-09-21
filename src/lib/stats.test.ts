@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { facetCountsDescending, wordsAddedByDay } from './stats'
+import { historyFacets, wordsAddedByDay } from './stats'
 import type { Word } from '../api/types'
 import type { WordType } from './wordTypes'
 
@@ -20,41 +20,39 @@ describe('wordsAddedByDay', () => {
   })
 })
 
-describe('facetCountsDescending', () => {
+describe('historyFacets', () => {
   function noun(id: number, artikel?: string): Word {
-    return { id, type: 'nomen', attrs: artikel ? { artikel } : {} } as Word
+    return { id, type: 'nomen', attrs: artikel ? { artikel } : {} } as unknown as Word
   }
   function other(id: number, type: WordType): Word {
-    return { id, type, attrs: {} } as Word
+    return { id, type, attrs: {} } as unknown as Word
   }
 
   it('orders facets from most to fewest words', () => {
     const words = [other(1, 'verb'), other(2, 'verb'), other(3, 'verb'), other(4, 'adjektiv')]
-    expect(facetCountsDescending(words).map((f) => [f.key, f.count])).toEqual([
-      ['verb', 3],
-      ['adjektiv', 1],
+    expect(historyFacets(words)).toEqual([
+      { kind: 'type', type: 'verb', count: 3 },
+      { kind: 'type', type: 'adjektiv', count: 1 },
     ])
   })
 
-  it('splits nouns by gender instead of one Nomen bucket', () => {
-    const words = [
-      noun(1, 'der'),
-      noun(2, 'die'),
-      noun(3, 'die'),
-      noun(4, 'das'),
-      noun(5, 'das'),
-      noun(6, 'das'),
-    ]
-    expect(facetCountsDescending(words)).toEqual([
-      { key: 'nomen:das', type: 'nomen', artikel: 'das', count: 3 },
-      { key: 'nomen:die', type: 'nomen', artikel: 'die', count: 2 },
-      { key: 'nomen:der', type: 'nomen', artikel: 'der', count: 1 },
+  it('keeps nouns as one facet carrying the total and the gender split', () => {
+    const words = [noun(1, 'der'), noun(2, 'die'), noun(3, 'die'), noun(4, 'das'), noun(5, 'das'), noun(6, 'das')]
+    expect(historyFacets(words)).toEqual([
+      {
+        kind: 'nouns',
+        count: 6,
+        genders: [
+          { artikel: 'das', count: 3 },
+          { artikel: 'die', count: 2 },
+          { artikel: 'der', count: 1 },
+        ],
+      },
     ])
   })
 
-  it('ranks each gender against the other types, not nouns as a whole', () => {
-    // Four nouns in total would outrank the three verbs if they were one
-    // bucket; split by gender, the verbs come first.
+  it('ranks the noun group by its total, not by any one gender', () => {
+    // Four nouns beat three verbs as a group, even though no single gender does.
     const words = [
       noun(1, 'der'),
       noun(2, 'der'),
@@ -64,41 +62,37 @@ describe('facetCountsDescending', () => {
       other(6, 'verb'),
       other(7, 'verb'),
     ]
-    expect(facetCountsDescending(words).map((f) => f.key)).toEqual([
-      'verb',
-      'nomen:der',
-      'nomen:die',
-      'nomen:das',
-    ])
+    const [first, second] = historyFacets(words)
+    expect(first).toMatchObject({ kind: 'nouns', count: 4 })
+    expect(second).toMatchObject({ kind: 'type', type: 'verb', count: 3 })
   })
 
-  it('keeps a noun with no article as a plain ungendered facet', () => {
+  it('counts an article-less noun in the total but gives it no gender segment', () => {
     // Older imports predate the required-attribute rule; they must still be
-    // counted and filterable rather than silently vanishing.
+    // reachable through the Nomen total rather than vanishing.
     const words = [noun(1), noun(2, 'der')]
-    expect(facetCountsDescending(words)).toEqual([
-      { key: 'nomen:der', type: 'nomen', artikel: 'der', count: 1 },
-      { key: 'nomen', type: 'nomen', artikel: null, count: 1 },
+    expect(historyFacets(words)).toEqual([
+      { kind: 'nouns', count: 2, genders: [{ artikel: 'der', count: 1 }] },
     ])
   })
 
-  it('ignores a malformed article rather than inventing a facet', () => {
-    const words = [{ id: 1, type: 'nomen', attrs: { artikel: 'DER' } } as unknown as Word]
-    expect(facetCountsDescending(words).map((f) => f.key)).toEqual(['nomen'])
+  it('omits genders that have no words', () => {
+    const [facet] = historyFacets([noun(1, 'die')])
+    expect(facet).toEqual({ kind: 'nouns', count: 1, genders: [{ artikel: 'die', count: 1 }] })
   })
 
-  it('leaves out facets with no words', () => {
-    expect(facetCountsDescending([other(1, 'phrase')]).map((f) => f.key)).toEqual(['phrase'])
+  it('leaves out types with no words', () => {
+    expect(historyFacets([other(1, 'phrase')])).toEqual([{ kind: 'type', type: 'phrase', count: 1 }])
   })
 
-  it('breaks ties on the fixed facet order so the row does not reshuffle', () => {
-    const a = facetCountsDescending([other(1, 'verb'), noun(2, 'die'), other(3, 'adjektiv')])
-    const b = facetCountsDescending([other(3, 'adjektiv'), other(1, 'verb'), noun(2, 'die')])
-    expect(a.map((f) => f.key)).toEqual(['nomen:die', 'verb', 'adjektiv'])
+  it('breaks ties on the fixed type order so the row does not reshuffle', () => {
+    const a = historyFacets([other(1, 'verb'), noun(2, 'die'), other(3, 'adjektiv')])
+    const b = historyFacets([other(3, 'adjektiv'), other(1, 'verb'), noun(2, 'die')])
+    expect(a.map((f) => (f.kind === 'nouns' ? 'nomen' : f.type))).toEqual(['nomen', 'verb', 'adjektiv'])
     expect(a).toEqual(b)
   })
 
   it('returns nothing for an empty collection', () => {
-    expect(facetCountsDescending([])).toEqual([])
+    expect(historyFacets([])).toEqual([])
   })
 })
