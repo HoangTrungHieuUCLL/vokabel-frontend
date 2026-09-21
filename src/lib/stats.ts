@@ -1,4 +1,5 @@
 import type { Word } from '../api/types'
+import { FACET_ORDER, facetArtikelOf, facetTypeOf, wordFacetKey, type Artikel } from './artikel'
 import { WORD_TYPES, type WordType } from './wordTypes'
 
 function localDateKey(d: Date): string {
@@ -34,22 +35,37 @@ export function wordsAddedByDay(words: Word[], days: number, today: Date = new D
   return result
 }
 
-export interface TypeCount {
+export interface FacetCount {
+  /** Either a word type, or "nomen:der" / "nomen:die" / "nomen:das". */
+  key: string
   type: WordType
+  artikel: Artikel | null
   count: number
 }
 
 /**
- * Types present in the collection, most words first — the order the History
- * filter row renders left to right.
+ * The facets present in the collection, most words first -- the order the
+ * History filter row renders left to right. Nouns are split by gender, so
+ * "der" and "die" are ranked against each other and against the other types
+ * rather than lumped into one Nomen bucket.
  *
- * Types with no words are left out rather than shown as an unusable "0" chip.
- * Ties fall back to the fixed WORD_TYPES order so the row stays put between
- * renders instead of reshuffling whenever two types are level.
+ * A facet with no words is left out rather than shown as an unusable "0"
+ * chip. Ties fall back to the fixed facet order so the row stays put between
+ * renders instead of reshuffling whenever two facets are level.
  */
-export function typeCountsDescending(words: Word[]): TypeCount[] {
-  const counts = countsByType(words)
-  return WORD_TYPES.map((type) => ({ type, count: counts[type] }))
-    .filter(({ count }) => count > 0)
-    .sort((a, b) => b.count - a.count || WORD_TYPES.indexOf(a.type) - WORD_TYPES.indexOf(b.type))
+export function facetCountsDescending(words: Word[]): FacetCount[] {
+  const counts = new Map<string, number>()
+  for (const word of words) {
+    const key = wordFacetKey(word)
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+
+  return [...counts.entries()]
+    .map(([key, count]) => ({
+      key,
+      type: facetTypeOf(key),
+      artikel: facetArtikelOf(key),
+      count,
+    }))
+    .sort((a, b) => b.count - a.count || FACET_ORDER.indexOf(a.key) - FACET_ORDER.indexOf(b.key))
 }

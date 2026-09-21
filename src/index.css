@@ -53,6 +53,15 @@
   --color-type-partikel: #8a7a1f;
   --color-type-phrase: #5b6470;
 
+  /* Noun gender. der/die/das follow the blue/red/green convention used by
+     most German textbooks, so the colours transfer off-screen. They reuse
+     the verb and adjective hues on purpose -- one fewer palette to learn,
+     and an article is always rendered as the word itself next to a "NO"
+     chip, so colour is never the only thing distinguishing it. */
+  --color-artikel-der: #2e4bff;
+  --color-artikel-die: #e5213f;
+  --color-artikel-das: #2c9e4a;
+
   --radius-card: 1.375rem;
   --radius-control: 0.875rem;
 

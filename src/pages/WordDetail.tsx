@@ -12,6 +12,7 @@ import { TypeChip } from '../components/ui/TypeChip'
 import { TypeAttrsOptional, TypeAttrsRequired } from '../components/TypeAttrsFields'
 import { ArrowLeftIcon, FlagIcon } from '../components/icons'
 import { useI18n } from '../i18n/I18nContext'
+import { ARTIKEL_COLOR_VAR, artikelOf } from '../lib/artikel'
 import { TYPE_ATTR_SPEC, missingRequiredAttrs } from '../lib/wordTypes'
 import { formatSince } from '../lib/relativeTime'
 import type { ExampleSentence } from '../api/types'
@@ -105,6 +106,7 @@ export function WordDetail() {
     navigate('/')
   }
 
+  const artikel = artikelOf(word)
   const attrSpec = TYPE_ATTR_SPEC[word.type]
   const allAttrFields = [...attrSpec.required, ...attrSpec.optional]
 
@@ -116,10 +118,13 @@ export function WordDetail() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <TypeChip type={word.type} size="md" showLabel />
-          {word.type === 'nomen' && typeof word.attrs.artikel === 'string' && (
-            <span className="rounded-full bg-accent px-2.5 py-1 font-display text-[14px] font-extrabold uppercase tracking-[0.03em] text-white">
-              {word.attrs.artikel as string}
+          <TypeChip type={word.type} artikel={artikel} size="md" showLabel />
+          {artikel && (
+            <span
+              className="rounded-full px-2.5 py-1 font-display text-[14px] font-extrabold uppercase tracking-[0.03em] text-white"
+              style={{ background: `var(${ARTIKEL_COLOR_VAR[artikel]})` }}
+            >
+              {artikel}
             </span>
           )}
           <h1 className="headline min-w-0 break-words text-[28px]">{word.word}</h1>
