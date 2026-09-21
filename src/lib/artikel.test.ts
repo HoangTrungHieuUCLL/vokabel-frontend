@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FACET_ORDER, artikelOf, facetArtikelOf, facetTypeOf, wordFacetKey } from './artikel'
+import { artikelOf, facetArtikelOf, facetTypeOf, matchesFacet, wordFacetKey } from './artikel'
 import type { Word } from '../api/types'
 
 const word = (type: string, attrs: Record<string, unknown> = {}) => ({ type, attrs }) as unknown as Word
@@ -43,14 +43,21 @@ describe('facet key parsing', () => {
   })
 })
 
-describe('FACET_ORDER', () => {
-  it('covers every key wordFacetKey can produce, so tie-breaking is never -1', () => {
-    for (const key of ['nomen:der', 'nomen:die', 'nomen:das', 'nomen', 'verb', 'phrase']) {
-      expect(FACET_ORDER).toContain(key)
-    }
+describe('matchesFacet', () => {
+  it('matches every noun under the bare nomen key, which backs the group total', () => {
+    expect(matchesFacet(word('nomen', { artikel: 'die' }), 'nomen')).toBe(true)
+    expect(matchesFacet(word('nomen'), 'nomen')).toBe(true)
+    expect(matchesFacet(word('verb'), 'nomen')).toBe(false)
   })
 
-  it('puts the three genders where Nomen sat, ahead of Verb', () => {
-    expect(FACET_ORDER.slice(0, 5)).toEqual(['nomen:der', 'nomen:die', 'nomen:das', 'nomen', 'verb'])
+  it('narrows to one gender under a gendered key', () => {
+    expect(matchesFacet(word('nomen', { artikel: 'die' }), 'nomen:die')).toBe(true)
+    expect(matchesFacet(word('nomen', { artikel: 'der' }), 'nomen:die')).toBe(false)
+    expect(matchesFacet(word('nomen'), 'nomen:die')).toBe(false)
+  })
+
+  it('matches other types by their own key', () => {
+    expect(matchesFacet(word('phrase'), 'phrase')).toBe(true)
+    expect(matchesFacet(word('phrase'), 'verb')).toBe(false)
   })
 })

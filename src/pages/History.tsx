@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react'
+import { TypeDonut } from '../components/charts/TypeDonut'
+import { DailyLineChart } from '../components/dashboard/DailyLineChart'
 import { TypeFilterChips } from '../components/history/TypeFilterChips'
 import { WordRow } from '../components/WordRow'
+import { Card } from '../components/ui/Card'
 import { useI18n } from '../i18n/I18nContext'
-import { wordFacetKey } from '../lib/artikel'
-import { facetCountsDescending } from '../lib/stats'
+import { facetTypeOf, matchesFacet } from '../lib/artikel'
+import { countsByType, historyFacets, wordsAddedByDay } from '../lib/stats'
 import { useWords } from '../state/WordsContext'
 
 export function History() {
@@ -11,13 +14,16 @@ export function History() {
   const { words, loading, toggleHard } = useWords()
   const [selected, setSelected] = useState<string | null>(null)
 
-  const counts = useMemo(() => facetCountsDescending(words), [words])
+  const facets = useMemo(() => historyFacets(words), [words])
+  const typeCounts = useMemo(() => countsByType(words), [words])
+  const dailyCounts = useMemo(() => wordsAddedByDay(words, 30), [words])
+
   // `words` arrives newest-first from WordsContext, so filtering preserves the
-  // recency order a history view wants without a second sort.
+  // recency order a history view wants without a second sort. Counting and
+  // filtering both route through the facet helpers, so a chip's number can
+  // never disagree with the list it opens.
   const visible = useMemo(
-    // Filtering goes through the same wordFacetKey the counts do, so a chip's
-    // number can never disagree with the list it opens.
-    () => (selected === null ? words : words.filter((w) => wordFacetKey(w) === selected)),
+    () => (selected === null ? words : words.filter((w) => matchesFacet(w, selected))),
     [words, selected],
   )
 
@@ -25,7 +31,27 @@ export function History() {
     <div className="flex flex-col gap-4">
       <h1 className="headline text-[32px]">{t('history.title')}</h1>
 
-      <TypeFilterChips counts={counts} total={words.length} selected={selected} onSelect={setSelected} />
+      {words.length > 0 && (
+        <div className="grid grid-cols-2 gap-3">
+          <Card className="flex flex-col gap-1.5 !p-3">
+            <p className="eyebrow text-[11px] text-ink-tertiary">{t('dashboard.byType')}</p>
+            <TypeDonut
+              counts={typeCounts}
+              activeType={selected ? facetTypeOf(selected) : null}
+              onSelect={(type) => setSelected(selected === type ? null : type)}
+            />
+          </Card>
+
+          <Card className="flex flex-col gap-1.5 !p-3">
+            <p className="eyebrow text-[11px] text-ink-tertiary">{t('dashboard.addedPerDay')}</p>
+            <div className="flex flex-1 items-center">
+              <DailyLineChart data={dailyCounts} />
+            </div>
+          </Card>
+        </div>
+      )}
+
+      <TypeFilterChips facets={facets} total={words.length} selected={selected} onSelect={setSelected} />
 
       {loading && words.length === 0 ? (
         <p className="text-[14px] text-ink-tertiary">{t('search.loading')}</p>
