@@ -145,9 +145,14 @@ export function AppShell() {
         </div>
 
         <nav
-          className="fixed inset-x-3 z-20 flex h-16 items-center gap-1 rounded-full border-2 border-ink bg-ink px-2 shadow-[0_8px_20px_rgba(20,20,20,0.35)] md:hidden"
+          className="fixed inset-x-3 z-20 flex h-16 items-center gap-1 rounded-full border-2 border-ink bg-ink p-2 shadow-[0_8px_20px_rgba(20,20,20,0.35)] md:hidden"
           style={{ bottom: 'max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem))' }}
         >
+          {/* p-2, not px-2: the links are h-full, so horizontal-only padding
+              would leave the active pill flush against the bar top and bottom
+              while inset 8px at the ends. Uniform padding gives it the same
+              8px on all four sides, and leaves each link exactly 44px tall --
+              the minimum tap target. */}
           {NAV_ITEMS.map(({ to, labelKey, Icon }) => (
             <NavLink
               key={to}
