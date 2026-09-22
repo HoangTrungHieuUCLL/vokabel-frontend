@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import * as api from '../../api/client'
-import type { NotificationStatus } from '../../api/types'
+import type { NotificationStatus, NotifySettings } from '../../api/types'
 import { useI18n } from '../../i18n/I18nContext'
 import {
   PermissionDeniedError,
   createSubscription,
-  formatSlots,
   getExistingSubscription,
   probeSupport,
   type PushSupport,
 } from '../../lib/push'
+import { NotifyTimesEditor } from './NotifyTimesEditor'
 import { BellIcon, BellOffIcon } from '../icons'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
@@ -22,6 +22,7 @@ export function NotificationSettings() {
   // state, not something to synchronise in an effect.
   const [support] = useState<PushSupport>(probeSupport)
   const [status, setStatus] = useState<NotificationStatus | null>(null)
+  const [times, setTimes] = useState<NotifySettings | null>(null)
   const [busy, setBusy] = useState<Busy>('idle')
   const [message, setMessage] = useState<string | null>(null)
   const [blocked, setBlocked] = useState(
@@ -34,6 +35,11 @@ export function NotificationSettings() {
       setStatus(await api.getNotificationStatus(existing?.endpoint))
     } catch {
       setStatus(null)
+    }
+    try {
+      setTimes(await api.getNotifySettings())
+    } catch {
+      setTimes(null)
     }
   }, [])
 
@@ -105,12 +111,15 @@ export function NotificationSettings() {
       <p className="eyebrow text-[12px]">{t('notify.title')}</p>
       <p className="text-[13px] text-ink-secondary">{t('notify.description')}</p>
 
-      {status && status.slots.length > 0 && (
-        <p className="text-[13px] text-ink-tertiary">
-          <span className="font-bold text-ink">{t('notify.slotsLabel')}:</span>{' '}
-          <span className="tabular-nums">{formatSlots(status.slots)}</span>{' '}
-          <span className="text-[11px]">({status.timezone})</span>
-        </p>
+      {times && (
+        <NotifyTimesEditor
+          settings={times}
+          onSaved={(next) => {
+            setTimes(next)
+            // The status card also prints the times and the next one due.
+            void refresh()
+          }}
+        />
       )}
 
       {support === 'needs-install' ? (
@@ -146,7 +155,7 @@ export function NotificationSettings() {
 
       {otherDevices > 0 && (
         <p className="text-[12px] text-ink-tertiary">
-          {otherDevices} {t('notify.otherDevices')}
+          {otherDevices} {otherDevices === 1 ? t('notify.otherDevice') : t('notify.otherDevices')}
         </p>
       )}
 

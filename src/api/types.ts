@@ -100,3 +100,12 @@ export interface PushSendResult {
   removed: number
   subscriptions: number
 }
+
+export interface NotifySettings {
+  /** Local "HH:MM" times, sorted. */
+  slots: string[]
+  timezone: string
+  /** False while the server's environment default is still in force. */
+  customised: boolean
+  max_slots: number
+}
