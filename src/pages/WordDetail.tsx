@@ -13,6 +13,7 @@ import { TypeAttrsOptional, TypeAttrsRequired } from '../components/TypeAttrsFie
 import { ArrowLeftIcon, FlagIcon } from '../components/icons'
 import { useI18n } from '../i18n/I18nContext'
 import { ARTIKEL_COLOR_VAR, artikelOf } from '../lib/artikel'
+import { headlineSizeClass } from '../lib/headline'
 import { TYPE_ATTR_SPEC, missingRequiredAttrs } from '../lib/wordTypes'
 import { formatSince } from '../lib/relativeTime'
 import type { ExampleSentence } from '../api/types'
@@ -138,8 +139,8 @@ export function WordDetail() {
     <div className="flex flex-col gap-5">
       {backButton}
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-wrap items-center gap-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
           <TypeChip type={word.type} artikel={artikel} size="md" showLabel />
           {artikel && (
             <span
@@ -149,7 +150,12 @@ export function WordDetail() {
               {artikel}
             </span>
           )}
-          <h1 className="headline min-w-0 break-words text-[28px]">{word.word}</h1>
+          {/* A long compound steps down a size so it does not wrap mid-word.
+              hyphens-auto lets Safari break at syllables where it has the
+              German dictionary; break-words is the last-resort fallback. */}
+          <h1 className={`headline min-w-0 hyphens-auto break-words ${headlineSizeClass(word.word)}`}>
+            {word.word}
+          </h1>
         </div>
         {!editing && (
           <OverflowMenu
