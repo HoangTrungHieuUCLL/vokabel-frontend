@@ -152,7 +152,7 @@ export function Import() {
                 <select
                   value={mapping[field.key] ?? NOT_MAPPED}
                   onChange={(e) => setMapping((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                  className="h-11 flex-1 max-w-56 rounded-[var(--radius-control)] border-2 border-ink bg-surface px-3 text-[14px]"
+                  className="h-11 flex-1 max-w-56 rounded-[var(--radius-control)] border-2 border-ink bg-surface px-3 text-[16px]"
                 >
                   <option value={NOT_MAPPED}>{t('import.notMapped')}</option>
                   {preview.headers.map((h) => (

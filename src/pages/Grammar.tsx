@@ -56,7 +56,7 @@ export function Grammar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('grammar.searchPlaceholder')}
-          className="h-8 min-w-0 flex-1 bg-transparent text-[15px] text-ink placeholder:text-ink-placeholder focus:outline-none"
+          className="h-8 min-w-0 flex-1 bg-transparent text-[16px] text-ink placeholder:text-ink-placeholder focus:outline-none"
         />
       </div>
 

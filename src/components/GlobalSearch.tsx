@@ -27,7 +27,7 @@ export function SearchBar({ query, onQueryChange, hardOnly, onToggleHard, inputR
         onChange={(e) => onQueryChange(e.target.value)}
         placeholder={t('search.placeholder')}
         aria-label={t('search.placeholder')}
-        className="h-8 min-w-0 flex-1 bg-transparent text-[15px] text-ink placeholder:text-ink-placeholder focus:outline-none"
+        className="h-8 min-w-0 flex-1 bg-transparent text-[16px] text-ink placeholder:text-ink-placeholder focus:outline-none"
       />
       {query && (
         <button
