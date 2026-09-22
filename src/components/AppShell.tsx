@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nContext'
 import { useWords } from '../state/WordsContext'
 import { SearchBar, SearchResults } from './GlobalSearch'
+import { useKeyboardInset } from '../lib/useKeyboardInset'
 import { usePresence } from '../lib/usePresence'
 import { BookIcon, GraduationCapIcon, HistoryIcon, LogoMark, PlusIcon, SearchIcon, SettingsIcon, XIcon } from './icons'
 import { Toast } from './ui/Toast'
@@ -44,6 +45,11 @@ export function AppShell() {
   // Kept mounted briefly after closing so the bar can slide back out instead
   // of blinking away.
   const searchBar = usePresence(searchOpen, 150)
+  // iOS leaves fixed elements pinned under the keyboard, so the bottom bars
+  // ride up by however much it covers.
+  const keyboardInset = useKeyboardInset()
+  const liftedBottom = (base: string) =>
+    keyboardInset > 0 ? `calc(${base} + ${keyboardInset}px)` : base
 
   // Opening the bar should put the cursor in it, or starting a search is two
   // taps instead of one.
@@ -126,6 +132,15 @@ export function AppShell() {
           // Only one floating row to clear now; the taller inset applies just
           // while the search input is out.
           className={`flex-1 overflow-y-auto md:pb-28 ${searchOpen ? 'pb-52' : 'pb-32'}`}
+          // With the keyboard up the content area keeps its full height on
+          // iOS, so the last rows would sit behind it unless the padding
+          // grows to match. Mirrors the class above rather than assuming the
+          // search bar is out -- the Add form raises the keyboard too.
+          style={
+            keyboardInset > 0
+              ? { paddingBottom: `calc(${searchOpen ? '13rem' : '8rem'} + ${keyboardInset}px)` }
+              : undefined
+          }
         >
           <div className="mx-auto w-full max-w-3xl px-4 py-6 md:px-8 md:py-10">
             {/* Hidden rather than unmounted: searching from halfway through the
@@ -172,7 +187,7 @@ export function AppShell() {
             one floating element for content to peek around instead of two. */}
         <div
           className="fixed inset-x-3 z-20 flex items-center gap-2 md:hidden"
-          style={{ bottom: 'max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem))' }}
+          style={{ bottom: liftedBottom('max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem))') }}
         >
           <nav className="flex h-16 flex-1 items-center gap-1 rounded-full border-2 border-ink bg-ink p-2 shadow-[0_8px_20px_rgba(20,20,20,0.35)]">
             {/* p-2, not px-2: the links are h-full, so horizontal-only padding
@@ -217,7 +232,9 @@ export function AppShell() {
             className={`fixed inset-x-3 z-20 flex h-16 items-center gap-2 rounded-full border-2 border-ink bg-surface px-4 shadow-[0_8px_20px_rgba(20,20,20,0.2)] md:hidden ${
               searchBar.leaving ? 'animate-bar-out' : 'animate-bar-in'
             }`}
-            style={{ bottom: 'calc(max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem)) + 4.75rem)' }}
+            style={{
+              bottom: liftedBottom('calc(max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem)) + 4.75rem)'),
+            }}
           >
             <SearchBar
               query={query}
