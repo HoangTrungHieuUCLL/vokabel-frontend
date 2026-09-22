@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nContext'
 import { useWords } from '../state/WordsContext'
 import { SearchBar, SearchResults } from './GlobalSearch'
+import { usePresence } from '../lib/usePresence'
 import { BookIcon, GraduationCapIcon, HistoryIcon, LogoMark, PlusIcon, SearchIcon, SettingsIcon, XIcon } from './icons'
 import { Toast } from './ui/Toast'
 import type { TranslationKey } from '../i18n/translations'
@@ -40,6 +41,9 @@ export function AppShell() {
   // Whether the mobile input is revealed. Distinct from `searching`: the bar
   // can be open with nothing typed in it yet.
   const [searchOpen, setSearchOpen] = useState(false)
+  // Kept mounted briefly after closing so the bar can slide back out instead
+  // of blinking away.
+  const searchBar = usePresence(searchOpen, 150)
 
   // Opening the bar should put the cursor in it, or starting a search is two
   // taps instead of one.
@@ -183,7 +187,7 @@ export function AppShell() {
                 onClick={closeSearch}
                 aria-label={t(labelKey)}
                 className={({ isActive }) =>
-                  `tap-target flex h-full flex-1 items-center justify-center rounded-full transition-colors ${
+                  `tap-target press-icon flex h-full flex-1 items-center justify-center rounded-full ${
                     isActive ? 'bg-highlight text-ink' : 'text-bg/70'
                   }`
                 }
@@ -198,7 +202,7 @@ export function AppShell() {
             onClick={() => (searchOpen ? closeSearch() : setSearchOpen(true))}
             aria-label={t('search.placeholder')}
             aria-expanded={searchOpen}
-            className={`tap-target press flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-ink shadow-[0_8px_20px_rgba(20,20,20,0.2)] transition-colors ${
+            className={`tap-target press-icon flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-ink shadow-[0_8px_20px_rgba(20,20,20,0.2)] ${
               searchOpen ? 'bg-highlight text-ink' : 'bg-surface text-ink'
             }`}
           >
@@ -208,9 +212,11 @@ export function AppShell() {
 
         {/* The input exists only while searching, so it costs no space the
             rest of the time. */}
-        {searchOpen && (
+        {searchBar.mounted && (
           <div
-            className="fixed inset-x-3 z-20 flex h-16 items-center gap-2 rounded-full border-2 border-ink bg-surface px-4 shadow-[0_8px_20px_rgba(20,20,20,0.2)] md:hidden"
+            className={`fixed inset-x-3 z-20 flex h-16 items-center gap-2 rounded-full border-2 border-ink bg-surface px-4 shadow-[0_8px_20px_rgba(20,20,20,0.2)] md:hidden ${
+              searchBar.leaving ? 'animate-bar-out' : 'animate-bar-in'
+            }`}
             style={{ bottom: 'calc(max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem)) + 4.75rem)' }}
           >
             <SearchBar
@@ -224,9 +230,12 @@ export function AppShell() {
         )}
       </div>
 
-      {pendingDelete && (
-        <Toast message={`„${pendingDelete.word}" ${t('toast.deleted')}`} actionLabel={t('toast.undo')} onAction={undoDelete} />
-      )}
+      <Toast
+        open={pendingDelete !== null}
+        message={pendingDelete ? `„${pendingDelete.word}" ${t('toast.deleted')}` : ''}
+        actionLabel={t('toast.undo')}
+        onAction={undoDelete}
+      />
     </div>
   )
 }

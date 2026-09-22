@@ -277,16 +277,15 @@ export function WordDetail() {
         </div>
       )}
 
-      {confirmingDelete && (
-        <ConfirmDialog
-          title={t('detail.deleteTitle')}
-          message={`„${word.word}" ${t('detail.deleteMessage')}`}
-          confirmLabel={t('detail.delete')}
-          danger
-          onConfirm={handleDelete}
-          onCancel={() => setConfirmingDelete(false)}
-        />
-      )}
+      <ConfirmDialog
+        open={confirmingDelete}
+        title={t('detail.deleteTitle')}
+        message={`„${word.word}" ${t('detail.deleteMessage')}`}
+        confirmLabel={t('detail.delete')}
+        danger
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmingDelete(false)}
+      />
     </div>
   )
 }
