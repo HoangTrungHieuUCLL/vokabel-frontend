@@ -79,15 +79,22 @@ export function TypeDonut({ counts, activeType, onSelect }: TypeDonutProps) {
         role="img"
         aria-label={t('dashboard.byType')}
       >
-        {slices.map(({ type, from, to }) => {
+        {slices.map(({ type, from, to }, i) => {
           const dimmed = focused !== null && focused !== type
           return (
             <path
               key={type}
+              className="animate-slice-in"
               d={arcPath(from, to)}
               fill={`var(${TYPE_COLOR_VAR[type]})`}
               opacity={dimmed ? 0.3 : 1}
-              style={{ cursor: onSelect ? 'pointer' : undefined, transition: 'opacity 120ms' }}
+              style={{
+                cursor: onSelect ? 'pointer' : undefined,
+                transition: 'opacity 120ms',
+                // Slices arrive in turn, so the ring draws itself rather than
+                // appearing whole.
+                animationDelay: `${i * 35}ms`,
+              }}
               onMouseEnter={() => setHovered(type)}
               onMouseLeave={() => setHovered(null)}
               onClick={() => onSelect?.(type)}

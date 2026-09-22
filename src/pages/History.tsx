@@ -63,8 +63,8 @@ export function History() {
             {visible.length} {visible.length === 1 ? t('history.record') : t('history.records')}
           </p>
           <ul className="flex flex-col gap-2">
-            {visible.map((word) => (
-              <WordRow key={word.id} word={word} onToggleHard={() => toggleHard(word.id)} />
+            {visible.map((word, i) => (
+              <WordRow key={word.id} word={word} index={i} onToggleHard={() => toggleHard(word.id)} />
             ))}
           </ul>
         </>

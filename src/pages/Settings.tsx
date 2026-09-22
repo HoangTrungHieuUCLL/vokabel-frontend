@@ -82,15 +82,14 @@ export function Settings() {
         {t('settings.logout')}
       </Button>
 
-      {confirmingLogout && (
-        <ConfirmDialog
-          title={t('settings.logoutConfirm')}
-          confirmLabel={t('settings.logout')}
-          danger
-          onConfirm={logout}
-          onCancel={() => setConfirmingLogout(false)}
-        />
-      )}
+      <ConfirmDialog
+        open={confirmingLogout}
+        title={t('settings.logoutConfirm')}
+        confirmLabel={t('settings.logout')}
+        danger
+        onConfirm={logout}
+        onCancel={() => setConfirmingLogout(false)}
+      />
     </div>
   )
 }

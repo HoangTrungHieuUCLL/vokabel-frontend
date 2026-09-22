@@ -6,9 +6,19 @@ import type { MatchField } from '../lib/search'
 import { TypeChip } from './ui/TypeChip'
 import { FlagIcon } from './icons'
 
+/** Only the first few rows stagger; beyond that a long list would trickle. */
+const STAGGER_LIMIT = 6
+const STAGGER_STEP_MS = 30
+
 interface WordRowProps {
   word: Word
   onToggleHard: () => void
+  /**
+   * Position in a stable list, which stages the row's entrance. Omit it for
+   * lists that rebuild as you type -- restarting the animation on every
+   * keystroke reads as flicker, not polish.
+   */
+  index?: number
   matchField?: MatchField
   matchStart?: number
   matchEnd?: number
@@ -26,15 +36,20 @@ function Highlighted({ text, start, end }: { text: string; start: number; end: n
   )
 }
 
-export function WordRow({ word, onToggleHard, matchField, matchStart, matchEnd, matchText }: WordRowProps) {
+export function WordRow({ word, onToggleHard, index, matchField, matchStart, matchEnd, matchText }: WordRowProps) {
   const { t } = useI18n()
   const meaningHighlighted = matchField === 'meaning' && matchStart !== undefined && matchEnd !== undefined
   const exampleHighlighted = matchField === 'example' && matchText !== undefined && matchStart !== undefined && matchEnd !== undefined
   const tagHighlighted = matchField === 'tag' && matchText !== undefined && matchStart !== undefined && matchEnd !== undefined
   const artikel = artikelOf(word)
 
+  const stagger =
+    index === undefined
+      ? undefined
+      : { animationDelay: `${Math.min(index, STAGGER_LIMIT) * STAGGER_STEP_MS}ms` }
+
   return (
-    <li>
+    <li className={index === undefined ? undefined : 'animate-row-in'} style={stagger}>
       <Link
         to={`/word/${word.id}`}
         className="tap-target flex items-center gap-3 rounded-[var(--radius-control)] border-2 border-ink bg-surface px-3 py-2 press"
