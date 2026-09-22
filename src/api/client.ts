@@ -3,6 +3,7 @@ import type {
   ImportPolicy,
   ImportPreview,
   NotificationStatus,
+  NotifySettings,
   PushSendResult,
   Spotlight,
   VapidKey,
@@ -135,6 +136,14 @@ export function unsubscribePush(endpoint: string): Promise<void> {
     method: 'POST',
     body: JSON.stringify({ endpoint }),
   })
+}
+
+export function getNotifySettings(): Promise<NotifySettings> {
+  return request('/notifications/settings')
+}
+
+export function saveNotifySettings(slots: string[]): Promise<NotifySettings> {
+  return request('/notifications/settings', { method: 'PUT', body: JSON.stringify({ slots }) })
 }
 
 export function sendTestNotification(): Promise<PushSendResult> {
