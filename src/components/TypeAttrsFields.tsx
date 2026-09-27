@@ -43,7 +43,7 @@ export function TypeAttrsRequired({ type, word, attrs, setAttr, regelmaessig, se
             onChange={(v) => setAttr('artikel', v)}
           />
         </div>
-        <Input id="attrs-plural" label={t('attr.plural')} value={(attrs.plural as string) ?? ''} onChange={(e) => setAttr('plural', e.target.value)} />
+        <Input id="attrs-plural" label={t('field.pluralOptional')} value={(attrs.plural as string) ?? ''} onChange={(e) => setAttr('plural', e.target.value)} />
       </div>
     )
   }
