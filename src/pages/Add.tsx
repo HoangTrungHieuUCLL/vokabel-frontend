@@ -6,6 +6,7 @@ import { Card } from '../components/ui/Card'
 import { Checkbox } from '../components/ui/Checkbox'
 import { ExampleSentencesInput } from '../components/ui/ExampleSentencesInput'
 import { Input, TextArea } from '../components/ui/Input'
+import { RelatedWordsInput } from '../components/ui/RelatedWordsInput'
 import { TagsInput } from '../components/ui/TagsInput'
 import { TypeChip } from '../components/ui/TypeChip'
 import { TypeAttrsOptional, TypeAttrsRequired } from '../components/TypeAttrsFields'
@@ -30,7 +31,7 @@ export function Add() {
   const [meaning, setMeaning] = useState('')
   const [example, setExample] = useState<ExampleSentence[]>([])
   const [tagsText, setTagsText] = useState('')
-  const [source, setSource] = useState('')
+  const [related, setRelated] = useState<string[]>([])
   const [comment, setComment] = useState('')
   const [isHard, setIsHard] = useState(false)
   const [attrs, setAttrs] = useState<Record<string, unknown>>({})
@@ -59,7 +60,7 @@ export function Add() {
     setMeaning('')
     setExample([])
     setTagsText('')
-    setSource('')
+    setRelated([])
     setComment('')
     setIsHard(false)
     setAttrs({})
@@ -91,7 +92,7 @@ export function Add() {
           .split(',')
           .map((t) => t.trim())
           .filter(Boolean),
-        source: source.trim() || null,
+        related,
         comment: comment.trim() || null,
         is_hard: isHard,
       })
@@ -164,7 +165,14 @@ export function Add() {
             onChange={setExample}
           />
           <TagsInput id="add-tags" label={t('add.tags')} value={tagsText} onChange={setTagsText} suggestions={allTags} />
-          <Input id="add-source" label={t('add.source')} value={source} onChange={(e) => setSource(e.target.value)} />
+          <RelatedWordsInput
+            id="add-related"
+            label={t('add.related')}
+            placeholder={t('add.relatedPlaceholder')}
+            value={related}
+            onChange={setRelated}
+            words={words}
+          />
           <TextArea id="add-comment" label={t('add.comment')} rows={2} value={comment} onChange={(e) => setComment(e.target.value)} />
         </div>
       )}

@@ -6,6 +6,7 @@ import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { ExampleSentencesInput } from '../components/ui/ExampleSentencesInput'
 import { Input, TextArea } from '../components/ui/Input'
+import { RelatedWordsInput } from '../components/ui/RelatedWordsInput'
 import { OverflowMenu } from '../components/ui/OverflowMenu'
 import { TagsInput } from '../components/ui/TagsInput'
 import { TypeChip } from '../components/ui/TypeChip'
@@ -16,6 +17,7 @@ import { ARTIKEL_COLOR_VAR, artikelOf } from '../lib/artikel'
 import { headlineSizeClass } from '../lib/headline'
 import { TYPE_ATTR_SPEC, missingRequiredAttrs } from '../lib/wordTypes'
 import { formatSince } from '../lib/relativeTime'
+import { makeSearchKey } from '../lib/searchKey'
 import type { ExampleSentence } from '../api/types'
 
 export function WordDetail() {
@@ -50,6 +52,12 @@ export function WordDetail() {
   const { getWord, patchWord, scheduleDelete, toggleHard, loading, words } = useWords()
   const word = getWord(wordId)
   const allTags = useMemo(() => Array.from(new Set(words.flatMap((w) => w.tags))).sort(), [words])
+  // Related entries are plain text; link the ones that name a recorded word.
+  const wordByKey = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const w of words) if (w.deleted_at === null && !map.has(w.search_key)) map.set(w.search_key, w.id)
+    return map
+  }, [words])
 
   const [editing, setEditing] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -60,6 +68,7 @@ export function WordDetail() {
   const [meaning, setMeaning] = useState('')
   const [example, setExample] = useState<ExampleSentence[]>([])
   const [tagsText, setTagsText] = useState('')
+  const [related, setRelated] = useState<string[]>([])
   const [source, setSource] = useState('')
   const [comment, setComment] = useState('')
   const [attrs, setAttrs] = useState<Record<string, unknown>>({})
@@ -71,6 +80,7 @@ export function WordDetail() {
     setMeaning(word.meaning)
     setExample(word.example)
     setTagsText(word.tags.join(', '))
+    setRelated(word.related ?? [])
     setSource(word.source ?? '')
     setComment(word.comment ?? '')
     setAttrs(word.attrs)
@@ -108,6 +118,7 @@ export function WordDetail() {
           .split(',')
           .map((t) => t.trim())
           .filter(Boolean),
+        related,
         source: source.trim() || null,
         comment: comment.trim() || null,
       })
@@ -216,6 +227,30 @@ export function WordDetail() {
               })}
             </div>
           )}
+          {(word.related ?? []).length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <p className="eyebrow text-[11px] text-ink-tertiary">{t('detail.related')}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {word.related.map((item, i) => {
+                  const targetId = wordByKey.get(makeSearchKey(item))
+                  return targetId !== undefined && targetId !== word.id ? (
+                    <button
+                      key={`${item}-${i}`}
+                      type="button"
+                      onClick={() => navigate(`/word/${targetId}`)}
+                      className="press rounded-full border-2 border-ink bg-accent-soft px-2.5 py-0.5 text-[13px] font-bold text-ink"
+                    >
+                      {item}
+                    </button>
+                  ) : (
+                    <span key={`${item}-${i}`} className="rounded-full border-2 border-border-soft px-2.5 py-0.5 text-[13px] font-semibold text-ink-secondary">
+                      {item}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          )}
           {word.comment && (
             <div>
               <p className="eyebrow text-[11px] text-ink-tertiary">{t('detail.comment')}</p>
@@ -265,6 +300,15 @@ export function WordDetail() {
             onChange={setExample}
           />
           <TagsInput id="detail-tags" label={t('detail.tagsLabel')} value={tagsText} onChange={setTagsText} suggestions={allTags} />
+          <RelatedWordsInput
+            id="detail-related"
+            label={t('detail.related')}
+            placeholder={t('add.relatedPlaceholder')}
+            value={related}
+            onChange={setRelated}
+            words={words}
+            excludeId={word.id}
+          />
           <Input id="detail-source" label={t('detail.source')} value={source} onChange={(e) => setSource(e.target.value)} />
           <TextArea id="detail-comment" label={t('detail.comment')} rows={3} value={comment} onChange={(e) => setComment(e.target.value)} />
           {saveError && <p className="text-[13px] font-semibold text-negative-text">{saveError}</p>}

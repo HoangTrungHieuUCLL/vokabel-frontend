@@ -16,6 +16,7 @@ export interface Word {
   example: ExampleSentence[]
   attrs: Record<string, unknown>
   tags: string[]
+  related: string[]
   source: string | null
   comment: string | null
   is_hard: boolean
@@ -37,6 +38,7 @@ export interface WordCreate {
   example?: ExampleSentence[]
   attrs?: Record<string, unknown>
   tags?: string[]
+  related?: string[]
   source?: string | null
   comment?: string | null
   is_hard?: boolean

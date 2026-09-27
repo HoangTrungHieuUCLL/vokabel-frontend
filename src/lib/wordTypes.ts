@@ -67,11 +67,12 @@ export interface TypeAttrSpec {
 // Mirrors app/schemas.py::TYPE_ATTR_SPEC on the backend. Keep in sync.
 export const TYPE_ATTR_SPEC: Record<WordType, TypeAttrSpec> = {
   nomen: {
-    required: [
-      { key: 'artikel', label: 'attr.artikel', type: 'enum', options: ['der', 'die', 'das'] },
+    required: [{ key: 'artikel', label: 'attr.artikel', type: 'enum', options: ['der', 'die', 'das'] }],
+    // Some nouns have no plural (die Milch), so it is not required.
+    optional: [
       { key: 'plural', label: 'attr.plural', type: 'string' },
+      { key: 'genitiv', label: 'attr.genitiv', type: 'string' },
     ],
-    optional: [{ key: 'genitiv', label: 'attr.genitiv', type: 'string' }],
   },
   verb: {
     required: [
